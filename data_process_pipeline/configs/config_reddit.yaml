@@ -1,0 +1,89 @@
+# culture relevance classifier
+culture_relevance:
+  # train_data: /sphinx/u/culturebank/reddit_data/annotations/cultural_relatedness/
+  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/dummy_data/fields.csv
+  classifier_path: /sphinx/u/culturebank/reddit_data/culture_relevance/models/distill_GPT4_1
+  model_name: distilbert-base-uncased
+  device: cuda:0
+  field_name_with_comments: comment_content
+  batch_size: 512
+
+# llama-based knowledge extractor, cannot be done by chatgpt, due to privacy in comments
+knowledge_extractor:
+  input_file: none 
+  output_file: none
+
+# negation, can be done by chatgpt, but pricey
+negation_converter:
+  input_file: /sphinx/u/culturebank/reddit_results/knowledge_extraction/output_culture_only.csv
+  output_file: /sphinx/u/culturebank/reddit_results/negation_converter/output.csv
+  
+# norm entailment, cannot be done by chatgpt, because the input contains the comment
+norm_entailment:
+  model_name: facebook/bart-large-mnli  # Example model
+  input_file: /sphinx/u/culturebank/reddit_results/negation_converter/output.csv
+  output_file: /sphinx/u/culturebank/reddit_results/norm_entailment/output.csv
+  batch_size: 1
+  fields_to_run:
+    - norm
+    - legality 
+
+# clustering component
+clustering_component:
+  data_source: "reddit"
+  input_file: /sphinx/u/culturebank/reddit_results/negation_converter/output.csv
+  output_file: /sphinx/u/culturebank/reddit_results/clustering_component/output.csv
+  output_score_file: /sphinx/u/culturebank/reddit_results/clustering_component/score.json
+  output_filtered_file: /sphinx/u/culturebank/reddit_results/clustering_component/output_filtered.csv
+  cultural_group_threshold: 0.3
+  sent_threshold: 0.4
+  min_cluster_size: 5
+  with_other_desc: true
+  annotated_file: none #/sphinx/u/culturebank/reddit_results/annotations/200_for_tiktok_whole_pipelines/200.csv
+  sbert:
+    model: all-MiniLM-L6-v2
+
+# /sphinx/u/culturebank/reddit_results/clustering_summarizer/reddit_summarizer_part
+cluster_summarizer:
+  input_file: /sphinx/u/culturebank/reddit_results/clustering_component/output_filtered.csv
+  output_file: /sphinx/u/culturebank/reddit_results/clustering_summarizer/output_random1000.json
+  original_before_cluster_file: /sphinx/u/culturebank/reddit_results/norm_entailment/output.csv
+  openai_model: gpt-3.5-turbo-16k
+  openai_engine: chatgpt0613
+  temperature: 0
+  max_tokens: 500
+  top_p: 0.01
+
+# /sphinx/u/culturebank/reddit_results/clustering_summarizer/reddit_summarizer_part
+confidence_calculator_for_reddits:
+  original_before_cluster_file: /sphinx/u/culturebank/reddit_results/negation_converter/output_with_unique_ids.csv
+  cluster_file: /sphinx/u/culturebank/reddit_results/clustering_component/group=0.3_sent=0.4_otherdesc=True/output_filtered.csv
+  cluster_summarization_input_file: /sphinx/u/culturebank/reddit_results/clustering_summarizer/reddit_summarizer_combined.csv
+  output_file: /sphinx/u/culturebank/reddit_results/confidence_calculator/output.csv
+
+content_filter:
+  input_file: /sphinx/u/culturebank/reddit_results/confidence_calculator/output.csv
+  output_file: /sphinx/u/culturebank/reddit_results/content_filter/output.csv
+  perspective_api_threshold: 0.2
+
+controversial_filter:
+  device: cuda:0
+  input_file: /sphinx/u/culturebank/reddit_results/content_filter/output.csv
+  output_file: /sphinx/u/culturebank/reddit_results/controversial_filter/output.csv
+  output_file_for_manual_annotation: /sphinx/u/culturebank/reddit_results/controversial_filter/output_for_annotation.csv
+  model_dir: /sphinx/u/culturebank/tiktok_data/controversial_data/models/combined_data_distilbert_4
+  keyword_list_dir: /sailhome/weiyans/CultureBank/data_process/scripts/list_of_words.txt
+  perspective_api_threshold: 0.1
+  
+topic_clustering:
+  input_file: /sphinx/u/culturebank/reddit_results/content_filter/output_random200.csv
+  output_file: /sphinx/u/culturebank/reddit_results/topic_clustering/output_random200.csv
+  output_score_file: /sphinx/u/culturebank/reddit_results/topic_clustering/output_random200_score.json
+  cultural_group_threshold: 0.3
+  topic_threshold: 0.6
+  sbert:
+    model: all-MiniLM-L6-v2
+
+annotated_files:
+  annotation_for_whole_pipeline: /sphinx/u/culturebank/reddit_results/annotations/200_for_tiktok_whole_pipelines/200.csv
+ 
