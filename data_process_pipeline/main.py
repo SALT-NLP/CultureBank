@@ -6,8 +6,7 @@ import logging
 
 from utils.config_reader import read_config
 import argparse
-from pipeline.main_pipeline import TiktokPipeline
-from pipeline.main_pipeline import RedditPipeline
+from pipeline.main_pipeline import CultureBankPipeline
 
 
 logging.basicConfig(
@@ -112,11 +111,7 @@ def main():
     config["dry_run"] = args.dry_run
 
     logger.info("Initializing the pipeline...")
-    if "tiktok" in args.config:
-        pipeline = TiktokPipeline(config)
-
-    if "reddit" in args.config:
-        pipeline = RedditPipeline(config)
+    pipeline = CultureBankPipeline(config)
 
     pipeline.run()
 

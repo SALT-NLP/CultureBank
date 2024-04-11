@@ -1,49 +1,41 @@
+result_base_dir: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results
+
 # culture relevance classifier
-culture_relevance:
+culture_relevance_classifier:
   # train_data: /sphinx/u/culturebank/reddit_data/annotations/cultural_relatedness/
-  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/dummy_data/fields.csv
+  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/dummy_data/comments.csv
+  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/culture_relevance_classifier/output.csv
   classifier_path: /sphinx/u/culturebank/reddit_data/culture_relevance/models/distill_GPT4_1
   model_name: distilbert-base-uncased
-  device: cuda:0
+  device: cpu
   field_name_with_comments: comment_content
   batch_size: 512
 
-# llama-based knowledge extractor, cannot be done by chatgpt, due to privacy in comments
+# llama-based knowledge extractor
 knowledge_extractor:
-  input_file: none 
-  output_file: none
+  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/culture_relevance_classifier/output.csv 
+  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/knowledge_extractor/output.csv
 
-# negation, can be done by chatgpt, but pricey
+# convert negation
 negation_converter:
-  input_file: /sphinx/u/culturebank/reddit_results/knowledge_extraction/output_culture_only.csv
-  output_file: /sphinx/u/culturebank/reddit_results/negation_converter/output.csv
-  
-# norm entailment, cannot be done by chatgpt, because the input contains the comment
-norm_entailment:
-  model_name: facebook/bart-large-mnli  # Example model
-  input_file: /sphinx/u/culturebank/reddit_results/negation_converter/output.csv
-  output_file: /sphinx/u/culturebank/reddit_results/norm_entailment/output.csv
-  batch_size: 1
-  fields_to_run:
-    - norm
-    - legality 
+  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/knowledge_extractor/output.csv
+  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/negation_converter/output.csv
 
 # clustering component
 clustering_component:
-  data_source: "reddit"
-  input_file: /sphinx/u/culturebank/reddit_results/negation_converter/output.csv
-  output_file: /sphinx/u/culturebank/reddit_results/clustering_component/output.csv
-  output_score_file: /sphinx/u/culturebank/reddit_results/clustering_component/score.json
-  output_filtered_file: /sphinx/u/culturebank/reddit_results/clustering_component/output_filtered.csv
+  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/negation_converter/output.csv
+  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/output.csv
+  output_score_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/score.json
+  output_filtered_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/output_filtered.csv
   cultural_group_threshold: 0.3
   sent_threshold: 0.4
   min_cluster_size: 5
   with_other_desc: true
-  annotated_file: none #/sphinx/u/culturebank/reddit_results/annotations/200_for_tiktok_whole_pipelines/200.csv
+  annotated_file: none #if you have a file with annotated clusters, feel free to put it here to get an evaluation score
   sbert:
     model: all-MiniLM-L6-v2
 
-# /sphinx/u/culturebank/reddit_results/clustering_summarizer/reddit_summarizer_part
+# cluster summarizer
 cluster_summarizer:
   input_file: /sphinx/u/culturebank/reddit_results/clustering_component/output_filtered.csv
   output_file: /sphinx/u/culturebank/reddit_results/clustering_summarizer/output_random1000.json
@@ -54,6 +46,11 @@ cluster_summarizer:
   max_tokens: 500
   top_p: 0.01
 
+# topic normalization
+topic_normalizer:
+  input_file: none
+  output_file: none
+  
 # /sphinx/u/culturebank/reddit_results/clustering_summarizer/reddit_summarizer_part
 confidence_calculator_for_reddits:
   original_before_cluster_file: /sphinx/u/culturebank/reddit_results/negation_converter/output_with_unique_ids.csv

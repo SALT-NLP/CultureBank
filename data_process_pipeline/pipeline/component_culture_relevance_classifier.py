@@ -6,6 +6,7 @@ import logging
 
 from pipeline.pipeline_component import PipelineComponent
 
+
 def get_best_ckpt(model_output_dir):
     ckpt_dirs = os.listdir(model_output_dir)
     ckpt_dirs = [dir for dir in ckpt_dirs if "checkpoint" in dir]
@@ -14,17 +15,24 @@ def get_best_ckpt(model_output_dir):
 
     return os.path.join(model_output_dir, last_ckpt)
 
+
 logger = logging.getLogger(__name__)
 
+
 class CultureRelevanceClassifier(PipelineComponent):
-    description = "Classify sentences/comments and pick out the culturally-relevant ones"
-    config_layer = "culture_classifier"
+    description = (
+        "Classify sentences/comments and pick out the culturally-relevant ones"
+    )
+    config_layer = "culture_relevance_classifier"
 
     def __init__(self, config: dict):
         super().__init__(config)
 
         # Get local config
         self._local_config = config[self.config_layer]
+        os.makedirs(
+            os.path.join(config["result_base_dir"], self.config_layer), exist_ok=True
+        )
 
         # Get the labels
         if "output_file" in self._local_config:
@@ -47,15 +55,18 @@ class CultureRelevanceClassifier(PipelineComponent):
         if self._config["dry_run"] is not None:
             df = df.head(self._config["dry_run"])
         return df
-    
+
     def run(self):
         id2label = {0: "No", 1: "Yes"}
         label2id = {"No": 0, "Yes": 1}
-        
+
         df = self.read_input()
         logger.info(f"total number of samples: {len(df)}")
         test_pred = self.classifier(
-            [str(r) for r in df[self._local_config["field_name_with_comments"]].tolist()],
+            [
+                str(r)
+                for r in df[self._local_config["field_name_with_comments"]].tolist()
+            ],
             batch_size=self._local_config["batch_size"],
             truncation=True,
             max_length=self._local_config["batch_size"],
@@ -71,4 +82,3 @@ class CultureRelevanceClassifier(PipelineComponent):
             self._local_config["output_file"],
             index=False,
         )
-

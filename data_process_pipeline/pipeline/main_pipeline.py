@@ -1,16 +1,20 @@
 import logging
-from pipeline.component_negation_converter import NegationConverter
-from pipeline.component_norm_entailment import NormEntailment
+import os
+
+# from pipeline.component_negation_converter import NegationConverter
+# from pipeline.component_norm_entailment import NormEntailment
 from pipeline.component_clustering import ClusteringComponent
 from pipeline.pipeline_component import PipelineComponent
-from pipeline.component_cluster_summarizer import ClusterSummarizer
-from pipeline.component_confidence_calculator import ConfidenceCalculator
-from pipeline.component_confidence_calculator_for_reddits import (
-    ConfidenceCalculatorForReddits,
-)
-from pipeline.component_content_filter import ContentFilter
-from pipeline.component_controversial_filter import ControversialFilter
-from pipeline.component_topic_clustering import TopicClustering
+
+# from pipeline.component_cluster_summarizer import ClusterSummarizer
+# from pipeline.component_confidence_calculator import ConfidenceCalculator
+# from pipeline.component_confidence_calculator_for_reddits import (
+#     ConfidenceCalculatorForReddits,
+# )
+# from pipeline.component_content_filter import ContentFilter
+# from pipeline.component_controversial_filter import ControversialFilter
+# from pipeline.component_topic_clustering import TopicClustering
+from pipeline.component_culture_relevance_classifier import CultureRelevanceClassifier
 
 logger = logging.getLogger(__name__)
 
@@ -71,39 +75,25 @@ class Pipeline:
             print(f"  ({i + 1}) {component.__name__} - {component.description}")
 
 
-class TiktokPipeline(Pipeline):
+class CultureBankPipeline(Pipeline):
     def __init__(self, config: dict):
-        logger.info("Initializing TiktokPipeline...")
+        logger.info("Initializing CultureBankPipeline...")
+        os.makedirs(config["result_base_dir"], exist_ok=True)
         super().__init__(config)
 
     @classmethod
     def get_possible_components(cls):
         return [
-            NegationConverter,
-            NormEntailment,
-            ClusteringComponent,
-            ClusterSummarizer,
-            ConfidenceCalculatorForReddits,
-            ContentFilter,
-            ControversialFilter,
-            TopicClustering,
+            CultureRelevanceClassifier,
+            # NegationConverter,
+            # NormEntailment,
+            # ClusteringComponent,
+            # ClusterSummarizer,
+            # ConfidenceCalculatorForReddits,
+            # ContentFilter,
+            # ControversialFilter,
+            # TopicClustering,
         ]
 
 
-class RedditPipeline(Pipeline):
-    def __init__(self, config: dict):
-        logger.info("Initializing RedditPipeline...")
-        super().__init__(config)
-
-    @classmethod
-    def get_possible_components(cls):
-        return [
-            NegationConverter,
-            NormEntailment,
-            ClusteringComponent,
-            ClusterSummarizer,
-            ConfidenceCalculatorForReddits,
-            ContentFilter,
-            ControversialFilter,
-            TopicClustering,
-        ]
+#
