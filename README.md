@@ -10,7 +10,7 @@ python /sailhome/weiyans/CultureBank/data_process/pipeline/culture_relevance_cla
 
 # pipeline
 ## add some dumb file
-# /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/dummy_data/fields.csv
+# /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/dummy_data/comments.csv
 CultureBank pipeline execution
 1.1 running cultural relevenace classifier (provide one model, the reddit one?)
 1.2 extraction (provide the fine-tuned mixtral model, the reddit one?) #ryan

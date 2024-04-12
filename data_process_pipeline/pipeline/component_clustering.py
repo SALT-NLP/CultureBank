@@ -161,7 +161,8 @@ class ClusteringComponent(PipelineComponent):
 
         # build a new dataframe for clusters
         clustered_df_unfiltered = pd.DataFrame(
-            columns=list(df.columns) + ["cluster_size", "cluster_ids", "raw_samples"]
+            columns=list(df.columns)
+            + ["cluster_size", "raw_sample_vids", "raw_samples"]
         )
 
         for cluster in tqdm(all_clusters):
@@ -170,16 +171,19 @@ class ClusteringComponent(PipelineComponent):
             rep_row = df.iloc[rep_idx]
             raw_samples = []
             raw_sample_ids = []
+            raw_sample_times = []
             for idx, _ in cluster:
                 item = df.iloc[idx]
                 sample_str = item.to_dict()
                 raw_samples.append(sample_str)
                 raw_sample_ids.append(item["vid_unique"])
+                raw_sample_times.append(item["comment_utc"])
 
             # Create a new row with the representative's data and the raw samples
             new_row = rep_row.to_dict()
             new_row["raw_samples"] = raw_samples
-            new_row["cluster_ids"] = raw_sample_ids
+            new_row["raw_sample_vids"] = raw_sample_ids
+            new_row["raw_sample_times"] = raw_sample_times
             new_row["cluster_size"] = len(raw_samples)
             clustered_df_unfiltered = pd.concat(
                 [clustered_df_unfiltered, pd.DataFrame([new_row])], ignore_index=True
@@ -211,7 +215,9 @@ class ClusteringComponent(PipelineComponent):
         vid_original_cluster_map = {}
         for vid_unique in vid_annotate_cluster_map:
             original_cluster_id = clustered_df_unfiltered[
-                clustered_df_unfiltered.cluster_ids.astype(str).str.contains(vid_unique)
+                clustered_df_unfiltered.raw_sample_vids.astype(str).str.contains(
+                    vid_unique
+                )
             ].cluster_id.values.item()
             vid_original_cluster_map[vid_unique] = original_cluster_id
         old_to_annotate_cluster_id_map = {}

@@ -56,9 +56,6 @@ def convert_to_affirmative(sentence, norm):
     return "".join(new_sentence), norm
 
 
-# TODO, use chatgpt for the conversion, but maybe pricy
-
-
 class NegationConverter(PipelineComponent):
     description = (
         "Convert the extracted data into positive form, if it contains negation"
@@ -94,11 +91,7 @@ class NegationConverter(PipelineComponent):
                 prev_norm = norm
             except:
                 continue
-            # print(f"original sentence: {sentence}")
-            # print(f"original norm: {norm}")
             sentence, norm = convert_to_affirmative(str(sentence), int(float(norm)))
-            # print(f"converted sentence: {sentence}")
-            # print(f"converted norm: {norm}")
             if prev_norm != norm:
                 total += 1
             df.iloc[idx]["actor's behavior"] = sentence

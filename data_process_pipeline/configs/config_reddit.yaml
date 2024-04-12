@@ -52,7 +52,7 @@ topic_normalizer:
   output_file: none
   
 # /sphinx/u/culturebank/reddit_results/clustering_summarizer/reddit_summarizer_part
-confidence_calculator_for_reddits:
+agreement_calculator:
   original_before_cluster_file: /sphinx/u/culturebank/reddit_results/negation_converter/output_with_unique_ids.csv
   cluster_file: /sphinx/u/culturebank/reddit_results/clustering_component/group=0.3_sent=0.4_otherdesc=True/output_filtered.csv
   cluster_summarization_input_file: /sphinx/u/culturebank/reddit_results/clustering_summarizer/reddit_summarizer_combined.csv
