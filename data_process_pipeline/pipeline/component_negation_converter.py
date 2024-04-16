@@ -94,8 +94,8 @@ class NegationConverter(PipelineComponent):
             sentence, norm = convert_to_affirmative(str(sentence), int(float(norm)))
             if prev_norm != norm:
                 total += 1
-            df.iloc[idx]["actor's behavior"] = sentence
-            df.iloc[idx]["norm"] = norm
+            df.at[idx, "actor's behavior"] = sentence
+            df.at[idx, "norm"] = norm
         logger.info(f"{total} are negation! {total/df.shape[0]:.3f}")
         self.save_output(df)
 

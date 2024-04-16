@@ -53,25 +53,16 @@ class AgreementCalculatorForReddits(PipelineComponent):
         # df_cluster shows which ids are inside the cluster
         for idx in tqdm(range(df_summary.shape[0])):
             df_line = df_summary.iloc[idx]
-            cluster_samples = []
             norm_confidence_scores = []
             norm_total = 0
-            for unique_id in eval(df_line["raw_sample_vids"]):
-                sub_raw_df = df_before_cluster[
-                    df_before_cluster.vid_unique == unique_id
-                ]
-                norm_value = parse_to_int(sub_raw_df["norm"].item())
-                # legal_value = parse_to_int(cluster_sample["legality"])
+            for norm_value in df_line["raw_sample_norms"]:
+                norm_value = parse_to_int(norm_value)
                 if norm_value is not None:
                     norm_confidence_scores.append(norm_value)
                     norm_total += 1
-                # if legal_value is not None:
-                #     legal_confidence_scores.append(legal_value)
-                #     legal_total += 1
             norm_confidence_score = np.mean(norm_confidence_scores)
             norm_confidence_score_list.append(norm_confidence_score)
             norm_total_list.append(norm_total)
-            # legal_confidence_score = np.mean(legal_confidence_scores)
         df_summary["cluster_size"] = norm_total_list
         df_summary["norm"] = norm_confidence_score_list
 

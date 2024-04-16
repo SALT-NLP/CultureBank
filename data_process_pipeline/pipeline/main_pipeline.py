@@ -1,7 +1,8 @@
 import logging
 import os
 
-# from pipeline.component_negation_converter import NegationConverter
+from pipeline.component_negation_converter import NegationConverter
+
 # from pipeline.component_norm_entailment import NormEntailment
 from pipeline.component_clustering import ClusteringComponent
 from pipeline.pipeline_component import PipelineComponent
@@ -79,13 +80,21 @@ class CultureBankPipeline(Pipeline):
     def __init__(self, config: dict):
         logger.info("Initializing CultureBankPipeline...")
         os.makedirs(config["result_base_dir"], exist_ok=True)
+        self._init_component_dir(config)
         super().__init__(config)
+
+    def _init_component_dir(self, config):
+        for component in self.get_possible_components():
+            os.makedirs(
+                os.path.join(config["result_base_dir"], component.config_layer),
+                exist_ok=True,
+            )
 
     @classmethod
     def get_possible_components(cls):
         return [
             CultureRelevanceClassifier,
-            # NegationConverter,
+            NegationConverter,
             # NormEntailment,
             # ClusteringComponent,
             # ClusterSummarizer,

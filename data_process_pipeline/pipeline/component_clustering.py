@@ -172,18 +172,21 @@ class ClusteringComponent(PipelineComponent):
             raw_samples = []
             raw_sample_ids = []
             raw_sample_times = []
+            raw_sample_norms = []
             for idx, _ in cluster:
                 item = df.iloc[idx]
                 sample_str = item.to_dict()
                 raw_samples.append(sample_str)
                 raw_sample_ids.append(item["vid_unique"])
                 raw_sample_times.append(item["comment_utc"])
+                raw_sample_norms.append(item["norm"])
 
             # Create a new row with the representative's data and the raw samples
             new_row = rep_row.to_dict()
             new_row["raw_samples"] = raw_samples
             new_row["raw_sample_vids"] = raw_sample_ids
             new_row["raw_sample_times"] = raw_sample_times
+            new_row["raw_sample_norms"] = raw_sample_norms
             new_row["cluster_size"] = len(raw_samples)
             clustered_df_unfiltered = pd.concat(
                 [clustered_df_unfiltered, pd.DataFrame([new_row])], ignore_index=True
