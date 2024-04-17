@@ -198,7 +198,7 @@ class ClusteringComponent(PipelineComponent):
 
                         self.df.at[idx, "has_culture"] = True
                         for output in outputs:
-                            for field in CULTUREBANK_FIELDS:
+                            for field in KNOWLEDGE_EXTRACTION_FIELDS:
                                 assert field in output
                         self.df.at[idx, "json_output"] = json.dumps(outputs)
 

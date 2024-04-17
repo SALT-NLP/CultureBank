@@ -11,3 +11,28 @@ CULTUREBANK_FIELDS = [
     "topic",
     "norm",
 ]
+
+EVAL_FIELDS = [
+    "cultural group",
+    "context",
+    "actor",
+    "recipient",
+    "relation",
+    "actor's behavior",
+    "goal",
+    "recipient's behavior",
+    "other descriptions",
+]
+
+DESC_FIELDS = [
+    "cultural group",
+    "context",
+    "actor",
+    "recipient",
+    "relation",
+    "actor's behavior",
+    "goal",
+    "recipient's behavior",
+    "other descriptions",
+    "norm",
+]
