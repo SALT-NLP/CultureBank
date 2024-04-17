@@ -95,7 +95,7 @@ class ClusteringComponent(PipelineComponent):
         tokenizer = AutoTokenizer.from_pretrained("mistralai/Mixtral-8x7B-Instruct-v0.1")
 
 
-        df = pd.read_csv(self._local_config["data_file"])
+        df = pd.read_csv(self._local_config["input_file"])
         max_samples = 10
         random.seed(123)
 

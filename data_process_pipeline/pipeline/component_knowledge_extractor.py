@@ -95,7 +95,7 @@ class ClusteringComponent(PipelineComponent):
             raise NotImplementedError
         
         tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
-        df = pd.read_csv(self._local_config["data_file"])
+        df = pd.read_csv(self._local_config["input_file"])
         
         if self._local_config["num_samples"] != -1:
             df = df.sample(n=self._local_config["num_samples"], replace=False, random_state=1234)
