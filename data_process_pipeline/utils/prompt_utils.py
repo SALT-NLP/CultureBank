@@ -381,3 +381,63 @@ QUESTION_EVAL_USER_TEMPLATE = '''Knowledge: {}
 Question: {}
 
 {} (Yes/No):'''
+
+
+SUMMARIZER_USER_PROMPT_TEMPLATE = """Here is a list of cultural behaviors that belong to a single cluster:
+{}
+
+Please summarize the above records into one consolidated JSON object. For each field in the output JSON, provide a concise, overarching summary that encapsulates the key essence or common theme of all records.
+
+Your JSON output should contain the following fields:
+{}
+
+Your summary should:
+1. Focus on the cultural aspect and ignore any non-cultural information
+2. Leave a field as null if it is inapplicable or not specified
+3. Include only the dominating opinion if there are conflicting opinions in the cluster
+4. Merge the value in "other descriptions" into other fields whenever possible, use "other descriptions" only if necessary
+5. Ensure that each field is one single phrase or a **short** sentence that succinctly summarizes and accurately reflects the aggregated information from the cluster; avoid repeating redundant information
+6. Include a "topic" field that summarizes the related cultural behavior into a single word or a high-level phrase
+
+Focus on creating a single concise, complete, culturally-focused, and accurately formatted JSON object without any extra words.
+
+Output:"""
+
+
+SUMMARIZER_INCONTEXT_USER_TEMPLATE = """Here is a list of cultural behaviors that belong to a single cluster:
+{}
+
+Please summarize the above records into one consolidated JSON object. For each field in the output JSON, provide a concise, overarching summary that encapsulates the key essence or common theme of all records.
+
+Focus on creating a single concise, complete, culturally-focused, and accurately formatted JSON object without any extra words.
+
+Output:"""
+
+
+SUMMARIZER_INCONTEXT_FIELDS_EXAMPLES = {
+    "cultural group": "group of people with the same cultural background",
+    "context": "location, or other settings this behavior is performed",
+    "actor": "the actor of the action",
+    "recipient": "the recipient of the action",
+    "relation": "relation between the actor and recipient",
+    "actor's behavior": "the behavior of the actor",
+    "goal": "goal of the actor's behavior",
+    "recipient's behavior": "the behavior of the recipient",
+    "other descriptions": "any other description that doesn't fit into previous categories",
+    "topic": "cultural topic relating to the behaviors",
+}
+
+SUMMARIZER_INCONTEXT_SAMPLES = """[{"cultural group": "American", "context": "in the United States", "actor": "people", "recipient": null, "relation": null, "actor's behavior": "find it wasteful", "goal": null, "recipient's behavior": null, "other descriptions": null}, {"cultural group": "American", "context": "in the United States", "actor": "people", "recipient": null, "relation": null, "actor's behavior": "be lazy and wasteful", "goal": null, "recipient's behavior": null, "other descriptions": null}, {"cultural group": "American", "context": "in the United States", "actor": "people", "recipient": null, "relation": null, "actor's behavior": "be lazy", "goal": null, "recipient's behavior": null, "other descriptions": "wasteful"}, {"cultural group": "American", "context": "in the United States", "actor": "people", "recipient": null, "relation": null, "actor's behavior": "be wasteful", "goal": null, "recipient's behavior": null, "other descriptions": null}, {"cultural group": "American", "context": "in the United States", "actor": "people", "recipient": null, "relation": null, "actor's behavior": "waste time", "goal": null, "recipient's behavior": null, "other descriptions": null}, {"cultural group": "American", "context": "in the United States", "actor": "people", "recipient": null, "relation": null, "actor's behavior": "get angry", "goal": null, "recipient's behavior": null, "other descriptions": "waste resources"}, {"cultural group": "American", "context": "in the United States", "actor": "people", "recipient": null, "relation": null, "actor's behavior": "waste resources", "goal": null, "recipient's behavior": null, "other descriptions": null}, {"cultural group": "American", "context": "in the United States", "actor": "people", "recipient": null, "relation": null, "actor's behavior": "consider something a waste of money", "goal": null, "recipient's behavior": null, "other descriptions": null}]"""
+
+SUMMARIZER_INCONTEXT_SUMMARY = {
+    "cultural group": "American",
+    "context": "in the United States",
+    "actor": "people",
+    "recipient": None,
+    "relation": None,
+    "actor's behavior": "perceived as wasteful and lazy in various aspects including food, work, time, resources, and financial habits",
+    "goal": None,
+    "recipient's behavior": None,
+    "other descriptions": None,
+    "topic": "lifestyle",
+}

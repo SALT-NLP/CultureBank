@@ -36,3 +36,15 @@ DESC_FIELDS = [
     "other descriptions",
     "norm",
 ]
+
+SUMMARIZER_FIELDS = [
+    "cultural group",
+    "context",
+    "actor",
+    "recipient",
+    "relation",
+    "actor's behavior",
+    "goal",
+    "recipient's behavior",
+    "other descriptions",
+]

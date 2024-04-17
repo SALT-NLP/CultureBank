@@ -13,7 +13,6 @@ import transformers
 import torch
 import random
 import json
-import argparse
 import logging
 import pandas as pd
 import numpy as np
@@ -213,6 +212,8 @@ class ClusteringComponent(PipelineComponent):
                 logger.error(e)
                 logger.error(f"error encountered at line {idx}, continuing...")
                 continue
+        self.save_output()
+        logger.info("Knowledge Extraction Done!")
     
     def save_output(self):
         self.df.to_csv(self._local_config["output_file"], index=None)
