@@ -14,6 +14,7 @@ culture_relevance_classifier:
 # llm-based knowledge extractor
 knowledge_extractor:
   input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/comments.csv 
+  output_raw: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/knowledge_extractor/output_raw.csv
   output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/knowledge_extractor/output.csv
   pattern: plain
   model: mistralai/Mistral-7B-Instruct-v0.2
@@ -24,18 +25,18 @@ knowledge_extractor:
 
 # convert negation
 negation_converter:
-  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/knowledge_extractor/output.csv
-  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/negation_converter/output.csv
+  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/knowledge_extractor/output.csv
+  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/negation_converter/output.csv
 
 # clustering component
 clustering_component:
-  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/negation_converter/output.csv
-  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/output.csv
-  output_score_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/score.json
-  output_filtered_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/output_filtered.csv
+  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/negation_converter/output.csv
+  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/clustering_component/output.csv
+  output_score_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/clustering_component/score.json
+  output_filtered_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/clustering_component/output_filtered.csv
   cultural_group_threshold: 0.3
   sent_threshold: 0.4
-  min_cluster_size: 5
+  min_cluster_size: 0
   with_other_desc: true
   annotated_file: none #if you have a file with annotated clusters, feel free to put it here to get an evaluation score
   sbert:
@@ -43,9 +44,9 @@ clustering_component:
 
 # cluster summarizer
 cluster_summarizer:
-  input_file: /sphinx/u/culturebank/reddit_results/clustering_component/output_filtered.csv
-  output_file: /sphinx/u/culturebank/reddit_results/clustering_summarizer/output_random1000.json
-  original_before_cluster_file: /sphinx/u/culturebank/reddit_results/norm_entailment/output.csv
+  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/clustering_component/group=0.3_sent=0.4_otherdesc=False/output_filtered.csv
+  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/cluster_summarizer/output.csv
+  original_before_cluster_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/negation_converter/output.csv
   pattern: plain
   model: mistralai/Mistral-7B-Instruct-v0.2
   num_samples: -1

@@ -110,7 +110,7 @@ class KnowledgeExtractor(PipelineComponent):
                 logger.info('\n')
             df = partitions[self._local_config["partition"]]
 
-            logger.info(f"currently processing {len(df)} clusters")
+            logger.info(f"currently processing {len(df)} records")
             logger.info(df.head())
 
 
@@ -129,6 +129,7 @@ class KnowledgeExtractor(PipelineComponent):
         text_model = self.text_model
         tokenizer = self.tokenizer
 
+        df_results = []
         for idx, row in tqdm(self.df.iterrows(), total=len(self.df)):
             try:
                 df_line = self.df.loc[idx]
@@ -198,8 +199,13 @@ class KnowledgeExtractor(PipelineComponent):
 
                         self.df.at[idx, "has_culture"] = True
                         for output in outputs:
+                            df_result = {}
+                            df_result["vid_unique"] = df_line["vid_unique"]
+                            df_result["comment_utc"] = df_line["comment_utc"]
                             for field in KNOWLEDGE_EXTRACTION_FIELDS:
                                 assert field in output
+                                df_result[field] = output[field]
+                            df_results.append(df_result)
                         self.df.at[idx, "json_output"] = json.dumps(outputs)
 
                         break
@@ -213,8 +219,10 @@ class KnowledgeExtractor(PipelineComponent):
                 logger.error(e)
                 logger.error(f"error encountered at line {idx}, continuing...")
                 continue
-        self.save_output()
+        self.save_output(df_results)
         logger.info("Knowledge Extraction Done!")
     
-    def save_output(self):
-        self.df.to_csv(self._local_config["output_file"], index=None)
+    def save_output(self, df_results):
+        self.df.to_csv(self._local_config["output_raw"], index=None)
+        df_results = pd.DataFrame.from_records(df_results, columns=["vid_unique", "comment_utc"] + KNOWLEDGE_EXTRACTION_FIELDS)
+        df_results.to_csv(self._local_config["output_file"], index=None)

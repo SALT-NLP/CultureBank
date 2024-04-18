@@ -97,7 +97,6 @@ class ClusterSummarizer(PipelineComponent):
 
 
         df = pd.read_csv(self._local_config["input_file"])
-        max_samples = 10
         random.seed(123)
 
         if self._local_config["filter_threshold"] != -1:
@@ -118,7 +117,7 @@ class ClusterSummarizer(PipelineComponent):
             logger.info(f"currently processing {len(df)} clusters")
             logger.info(df.head())
 
-        if args.sanity_check:
+        if self.sanity_check:
             df = df.head(10)
         self.df = df
         self.text_model = text_model
@@ -135,12 +134,13 @@ class ClusterSummarizer(PipelineComponent):
         ).T.to_dict()
 
         df_results = []
+        max_samples = 10
         for idx, row in tqdm(df.iterrows(), total=len(df)):
             try:
                 df_line = df.loc[idx]
                 raw_samples = df_line["raw_samples"]
                 raw_samples = []
-                for unique_id in eval(df_line["cluster_ids"]):
+                for unique_id in eval(df_line["raw_sample_vids"]):
                     raw_sample = {
                         field: dict_before_cluster[unique_id][field]
                         for field in SUMMARIZER_FIELDS + ["norm"]
@@ -207,7 +207,7 @@ class ClusterSummarizer(PipelineComponent):
                 logger.error(f"error encountered at cluster {idx}, continuing...")
                 continue
         self.save_output(df_results)
-        logger.info("Knowledge Extraction Done!")
+        logger.info("Cluster Summarization Done!")
     
     def save_output(self, df_results):
         df_results = pd.DataFrame.from_records(df_results, columns=["cluster_id"] + SUMMARIZER_FIELDS + ['topic'])

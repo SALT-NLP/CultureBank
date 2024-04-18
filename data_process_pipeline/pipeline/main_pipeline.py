@@ -6,7 +6,8 @@ from pipeline.component_negation_converter import NegationConverter
 from pipeline.component_clustering import ClusteringComponent
 from pipeline.pipeline_component import PipelineComponent
 from pipeline.component_knowledge_extractor import KnowledgeExtractor
-# from pipeline.component_cluster_summarizer import ClusterSummarizer
+from pipeline.component_cluster_summarizer import ClusterSummarizer
+# from pipeline.component_confidence_calculator import ConfidenceCalculator
 from pipeline.component_agreement_calculator import AgreementCalculator
 
 # from pipeline.component_confidence_calculator_for_reddits import (
@@ -96,11 +97,11 @@ class CultureBankPipeline(Pipeline):
             CultureRelevanceClassifier,
             KnowledgeExtractor,
             NegationConverter,
+            # NormEntailment,
             ClusteringComponent,
-            # ClusterSummarizer,
-            AgreementCalculator,
-            ContentModeration,
-            FinalFormatter,
+            ClusterSummarizer,
+            # ConfidenceCalculatorForReddits,
+            # ContentFilter,
             # ControversialFilter,
             # TopicClustering,
         ]
