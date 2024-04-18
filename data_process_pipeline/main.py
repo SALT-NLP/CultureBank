@@ -1,5 +1,5 @@
 """
-python main.py -i 0 -c /sailhome/weiyans/CultureBank/data_process/config_tiktok.yaml --dry_run 200
+python main.py -i 3 -c /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/configs/custom_config.yaml
 """
 
 import logging

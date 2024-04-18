@@ -5,7 +5,7 @@ from pipeline.component_negation_converter import NegationConverter
 
 from pipeline.component_clustering import ClusteringComponent
 from pipeline.pipeline_component import PipelineComponent
-
+from pipeline.component_knowledge_extractor import KnowledgeExtractor
 # from pipeline.component_cluster_summarizer import ClusterSummarizer
 from pipeline.component_agreement_calculator import AgreementCalculator
 
@@ -60,7 +60,7 @@ class Pipeline:
                 f"Possible components: "
                 + str(
                     [
-                        ((i + 1), c.__name__)
+                        ((i), c.__name__)
                         for i, c in enumerate(self.get_possible_components())
                     ]
                 )
@@ -94,6 +94,7 @@ class CultureBankPipeline(Pipeline):
     def get_possible_components(cls):
         return [
             CultureRelevanceClassifier,
+            KnowledgeExtractor,
             NegationConverter,
             ClusteringComponent,
             # ClusterSummarizer,

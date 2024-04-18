@@ -19,11 +19,12 @@ import numpy as np
 
 from utils.util import parse_to_int, process_output
 from utils.prompt_utils import get_mixtral_user_prompt, reencode_prompt_utf16, truncate_to_token_limit, KNOWLEDGE_EXTRACTION_FIELDS
+from pipeline.pipeline_component import PipelineComponent
 
 logger = logging.getLogger(__name__)
 
 
-class ClusteringComponent(PipelineComponent):
+class KnowledgeExtractor(PipelineComponent):
     description = "extracting structured cultural knowledge from social media comments"
     config_layer = "knowledge_extractor"
     

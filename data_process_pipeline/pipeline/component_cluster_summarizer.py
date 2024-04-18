@@ -14,14 +14,15 @@ import pandas as pd
 import numpy as np
 
 from utils.constants import SUMMARIZER_FIELDS
-from utils.prompt_utils import SUMMARIZER_USER_PROMPT_TEMPLATE, SUMMARIZER_INCONTEXT_FIELDS_EXAMPLES
-from utils.util import parse_to_int, truncate_to_token_limit
+from utils.prompt_utils import SUMMARIZER_USER_PROMPT_TEMPLATE, SUMMARIZER_INCONTEXT_FIELDS_EXAMPLES, truncate_to_token_limit
+from utils.util import parse_to_int
+from pipeline.pipeline_component import PipelineComponent
 
 
 logger = logging.getLogger(__name__)
 
 
-class ClusteringComponent(PipelineComponent):
+class ClusterSummarizer(PipelineComponent):
     description = "summarize clustered cultural indicators"
     config_layer = "cluster_summarizer"
     
@@ -128,7 +129,7 @@ class ClusteringComponent(PipelineComponent):
         text_model = self.text_model
         tokenizer = self.tokenizer
         
-        df_before_cluster = pd.read_csv(self._local_config["before_cluster"])
+        df_before_cluster = pd.read_csv(self._local_config["original_before_cluster_file"])
         dict_before_cluster = df_before_cluster.set_index(
             df_before_cluster["vid_unique"]
         ).T.to_dict()
