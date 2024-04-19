@@ -1,10 +1,11 @@
+project_base_dir: /sailhome/weiyans/culturebank_public/CultureBank/
 result_base_dir: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results
 
 # culture relevance classifier
 culture_relevance_classifier:
   # train_data: /sphinx/u/culturebank/reddit_data/annotations/cultural_relatedness/
-  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/dummy_data/comments.csv
-  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/culture_relevance_classifier/output.csv
+  input_file: data_process_pipeline/dummy_data/comments.csv
+  output_file: data_process_pipeline/results/culture_relevance_classifier/output.csv
   classifier_path: /sphinx/u/culturebank/reddit_data/culture_relevance/models/distill_GPT4_1
   model_name: distilbert-base-uncased
   device: cpu
@@ -24,15 +25,15 @@ knowledge_extractor:
 
 # convert negation
 negation_converter:
-  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/knowledge_extractor/output.csv
-  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/negation_converter/output.csv
+  input_file: data_process_pipeline/results/knowledge_extractor/output.csv
+  output_file: data_process_pipeline/results/negation_converter/output.csv
 
 # clustering component
 clustering_component:
-  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/negation_converter/output.csv
-  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/output.csv
-  output_score_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/score.json
-  output_filtered_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/output_filtered.csv
+  input_file: data_process_pipeline/results/negation_converter/output.csv
+  output_file: data_process_pipeline/results/clustering_component/output.csv
+  output_score_file: data_process_pipeline/results/clustering_component/score.json
+  output_filtered_file: data_process_pipeline/results/clustering_component/output_filtered.csv
   cultural_group_threshold: 0.3 # this will be overriden by the parameters in CultureBank/data_process_pipeline/main.py
   sent_threshold: 0.4  # this will be overriden by the parameters in CultureBank/data_process_pipeline/main.py
   min_cluster_size: 1
@@ -63,24 +64,25 @@ topic_normalizer:
   input_file: none
   output_file: none
   
-# /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_summarizer/reddit_summarizer_part
+# agreement calculator
 agreement_calculator:
-  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_summarizer/output.csv
-  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/agreement_calculator/output.csv
+  input_file: data_process_pipeline/results/clustering_summarizer/output.csv
+  output_file: data_process_pipeline/results/agreement_calculator/output.csv
 
+# content moderation
 content_moderation:
-  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/agreement_calculator/output.csv
-  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/content_moderation/output.csv
-  output_file_for_manual_annotation: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/content_moderation/output_for_annotation.csv
+  input_file: data_process_pipeline/results/agreement_calculator/output.csv
+  output_file: data_process_pipeline/results/content_moderation/output.csv
+  output_file_for_manual_annotation: data_process_pipeline/results/content_moderation/output_for_annotation.csv
   hard_api_threshold: 0.2 # >=0.2 will be removed without any annotation
   soft_api_threshold: 0.1 # [0.1, 0.2) will go through a manual check
-  keyword_list_dir: /sailhome/weiyans/CultureBank/data_process/scripts/list_of_words.txt
+  keyword_list_dir: /sphinx/u/culturebank/reddit_data/list_of_words.txt
   device: cuda:0
   controversial_field_name_to_annotate: controversial_or_PII
   model_dir: /sphinx/u/culturebank/tiktok_data/controversial_data/models/combined_data_distilbert_4/checkpoint-210
 
 final_formatter:
-  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/content_moderation/output.csv
-  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/final_formatter/output.csv
-  controversial_annotation_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/content_moderation/human_annotation.csv
+  input_file: data_process_pipeline/results/content_moderation/output.csv
+  output_file: data_process_pipeline/results/final_formatter/output.csv
+  controversial_annotation_file: data_process_pipeline/results/content_moderation/human_annotation.csv
  
