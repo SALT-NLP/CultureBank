@@ -13,7 +13,7 @@ from pipeline.component_agreement_calculator import AgreementCalculator
 # from pipeline.component_confidence_calculator_for_reddits import (
 #     ConfidenceCalculatorForReddits,
 # )
-from pipeline.component_content_moderation import ContentModeration
+# from pipeline.component_content_moderation import ContentModeration
 
 from pipeline.component_final_formatter import FinalFormatter
 # from pipeline.component_content_filter import ContentFilter
@@ -85,6 +85,7 @@ class CultureBankPipeline(Pipeline):
         logger.info("Initializing CultureBankPipeline...")
         os.makedirs(config["result_base_dir"], exist_ok=True)
         self._init_component_dir(config)
+        self._concat_project_base_dir_and_input_output_file(config)
         super().__init__(config)
 
     def _init_component_dir(self, config):
@@ -102,6 +103,7 @@ class CultureBankPipeline(Pipeline):
             for file_type in [
                 "input_file",
                 "output_file",
+                "output_raw",
                 "output_score_file",
                 "output_filtered_file",
                 "original_before_cluster_file",

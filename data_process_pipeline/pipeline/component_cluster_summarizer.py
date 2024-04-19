@@ -95,7 +95,10 @@ class ClusterSummarizer(PipelineComponent):
 
         tokenizer = AutoTokenizer.from_pretrained("mistralai/Mixtral-8x7B-Instruct-v0.1")
 
-
+        self.text_model = text_model
+        self.tokenizer = tokenizer
+    
+    def run(self):
         df = pd.read_csv(self._local_config["input_file"])
         random.seed(123)
 
@@ -119,12 +122,7 @@ class ClusterSummarizer(PipelineComponent):
 
         if self.sanity_check:
             df = df.head(10)
-        self.df = df
-        self.text_model = text_model
-        self.tokenizer = tokenizer
-    
-    def run(self):
-        df = self.df
+
         text_model = self.text_model
         tokenizer = self.tokenizer
         

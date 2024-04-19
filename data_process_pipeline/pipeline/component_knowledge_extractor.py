@@ -96,6 +96,11 @@ class KnowledgeExtractor(PipelineComponent):
             raise NotImplementedError
         
         tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+        
+        self.tokenizer = tokenizer
+        self.text_model = text_model
+    
+    def run(self):
         df = pd.read_csv(self._local_config["input_file"])
         
         if self._local_config["num_samples"] != -1:
@@ -116,12 +121,8 @@ class KnowledgeExtractor(PipelineComponent):
 
         if self.sanity_check:
             df = df.head(5)
-        
-        self.tokenizer = tokenizer
         self.df = df
-        self.text_model = text_model
-    
-    def run(self):
+        
         self.df["has_culture"] = False
         self.df["model_resp"] = ""
         self.df["json_output"] = ""
