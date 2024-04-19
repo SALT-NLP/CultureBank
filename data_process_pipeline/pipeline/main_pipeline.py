@@ -16,6 +16,9 @@ from pipeline.component_agreement_calculator import AgreementCalculator
 from pipeline.component_content_moderation import ContentModeration
 
 from pipeline.component_final_formatter import FinalFormatter
+# from pipeline.component_content_filter import ContentFilter
+# from pipeline.component_controversial_filter import ControversialFilter
+from pipeline.component_topic_normalization import TopicNormalizer
 from pipeline.component_culture_relevance_classifier import CultureRelevanceClassifier
 
 logger = logging.getLogger(__name__)
@@ -100,10 +103,10 @@ class CultureBankPipeline(Pipeline):
             # NormEntailment,
             ClusteringComponent,
             ClusterSummarizer,
+            TopicNormalizer,
             # ConfidenceCalculatorForReddits,
             # ContentFilter,
             # ControversialFilter,
-            # TopicClustering,
         ]
 
 

@@ -441,3 +441,23 @@ SUMMARIZER_INCONTEXT_SUMMARY = {
     "other descriptions": None,
     "topic": "lifestyle",
 }
+
+
+TOPIC_SYSTEM_MESSAGE = '''Given a list of common cultural themes, your task is to match a user-provided cultural topic to one of these themes. Cultural themes refer to broad categories that capture various aspects of human culture, such as food habits, social norms, or language use. If a provided topic does not clearly fit into any of the listed themes, categorize it as "Miscellaneous."
+
+Here is the list of cultural themes you should use when processing user inputs:
+{}
+
+For each user-provided cultural topic, determine the best matching theme from the list. If the topic could fit into more than one theme, choose the one that is most specific to the topic's core aspect. If no theme fits, output "Miscellaneous."
+Output only the best matching theme or "Miscellaneous," without any additional words.
+
+Example 1:
+User-provided topic: afternoon tea traditions
+Output: Food and Dining
+
+Example 2:
+User-provided topic: package theft
+Output: Miscellaneous'''
+
+TOPIC_USER_MESSAGE_TEMPLATE = '''User-provided topic: {}
+Output:'''

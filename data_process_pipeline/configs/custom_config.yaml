@@ -1,10 +1,10 @@
-result_base_dir: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data
+result_base_dir: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results
 
 # culture relevance classifier
 culture_relevance_classifier:
   # train_data: /sphinx/u/culturebank/reddit_data/annotations/cultural_relatedness/
-  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/dummy_data/comments.csv
-  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/culture_relevance_classifier/output.csv
+  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/comments.csv
+  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/culture_relevance_classifier/output.csv
   classifier_path: /sphinx/u/culturebank/reddit_data/culture_relevance/models/distill_GPT4_1
   model_name: distilbert-base-uncased
   device: cpu
@@ -13,9 +13,9 @@ culture_relevance_classifier:
 
 # llm-based knowledge extractor
 knowledge_extractor:
-  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/comments.csv 
-  output_raw: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/knowledge_extractor/output_raw.csv
-  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/knowledge_extractor/output.csv
+  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/culture_relevance_classifier/output.csv 
+  output_raw: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/output_raw.csv
+  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/knowledge_extractor/output.csv
   pattern: plain
   model: mistralai/Mistral-7B-Instruct-v0.2
   num_samples: -1
@@ -25,15 +25,15 @@ knowledge_extractor:
 
 # convert negation
 negation_converter:
-  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/knowledge_extractor/output.csv
-  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/negation_converter/output.csv
+  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/knowledge_extractor/output.csv
+  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/negation_converter/output.csv
 
 # clustering component
 clustering_component:
-  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/negation_converter/output.csv
-  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/clustering_component/output.csv
-  output_score_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/clustering_component/score.json
-  output_filtered_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/clustering_component/output_filtered.csv
+  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/negation_converter/output.csv
+  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/clustering_component/output.csv
+  output_score_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/clustering_component/score.json
+  output_filtered_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/clustering_component/output_filtered.csv
   cultural_group_threshold: 0.3
   sent_threshold: 0.4
   min_cluster_size: 0
@@ -44,9 +44,9 @@ clustering_component:
 
 # cluster summarizer
 cluster_summarizer:
-  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/clustering_component/group=0.3_sent=0.4_otherdesc=False/output_filtered.csv
-  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/cluster_summarizer/output.csv
-  original_before_cluster_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/dummy_data/negation_converter/output.csv
+  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/clustering_component/group=0.3_sent=0.4_otherdesc=False/output_filtered.csv
+  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/cluster_summarizer/output.csv
+  original_before_cluster_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/negation_converter/output.csv
   pattern: plain
   model: mistralai/Mistral-7B-Instruct-v0.2
   num_samples: -1
@@ -61,8 +61,18 @@ cluster_summarizer:
 
 # topic normalization
 topic_normalizer:
-  input_file: none
-  output_file: none
+  input_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/cluster_summarizer/output.csv
+  output_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/topic_normalizer/output.csv
+  output_score_file: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results/topic_normalizer/output_score.json
+  cultural_group_threshold: 0.3
+  sbert:
+    model: all-MiniLM-L6-v2
+  openai:
+    model: gpt-3.5-turbo-1106
+    temperature: 0.5
+    max_tokens: 20
+    top_p: 0.3
+    seed: 1234
   
 # /sphinx/u/culturebank/reddit_results/clustering_summarizer/reddit_summarizer_part
 agreement_calculator:
@@ -85,14 +95,6 @@ controversial_filter:
   keyword_list_dir: /sailhome/weiyans/CultureBank/data_process/scripts/list_of_words.txt
   perspective_api_threshold: 0.1
   
-topic_clustering:
-  input_file: /sphinx/u/culturebank/reddit_results/content_filter/output_random200.csv
-  output_file: /sphinx/u/culturebank/reddit_results/topic_clustering/output_random200.csv
-  output_score_file: /sphinx/u/culturebank/reddit_results/topic_clustering/output_random200_score.json
-  cultural_group_threshold: 0.3
-  topic_threshold: 0.6
-  sbert:
-    model: all-MiniLM-L6-v2
 
 annotated_files:
   annotation_for_whole_pipeline: /sphinx/u/culturebank/reddit_results/annotations/200_for_tiktok_whole_pipelines/200.csv

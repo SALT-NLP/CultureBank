@@ -1,5 +1,5 @@
 """
-python main.py -i 3 -c /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/configs/custom_config.yaml
+python main.py -i 5 -c /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/configs/custom_config.yaml
 """
 
 import logging
