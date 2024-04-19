@@ -90,6 +90,26 @@ class CultureBankPipeline(Pipeline):
                 exist_ok=True,
             )
 
+    def _concat_project_base_dir_and_input_output_file(self, config):
+        """
+        concat the project base dir with all the related files in each component
+        """
+        for component in self.get_possible_components():
+            for file_type in [
+                "input_file",
+                "output_file",
+                "output_score_file",
+                "output_filtered_file",
+                "original_before_cluster_file",
+                "output_file_for_manual_annotation",
+                "controversial_annotation_file",
+            ]:
+                if file_type in config[component.config_layer]:
+                    config[component.config_layer][file_type] = os.path.join(
+                        config["project_base_dir"],
+                        config[component.config_layer][file_type],
+                    )
+
     @classmethod
     def get_possible_components(cls):
         return [
