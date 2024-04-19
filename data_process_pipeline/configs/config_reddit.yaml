@@ -1,5 +1,5 @@
-project_base_dir: /sailhome/weiyans/culturebank_public/CultureBank/
-result_base_dir: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results
+project_base_dir: /sailhome/lansong/CultureBank/CultureBank/
+result_base_dir: /sailhome/lansong/CultureBank/CultureBank/data_process_pipeline/results
 
 # culture relevance classifier
 culture_relevance_classifier:
@@ -12,10 +12,17 @@ culture_relevance_classifier:
   field_name_with_comments: comment_content
   batch_size: 512
 
-# llama-based knowledge extractor
+# llm-based knowledge extractor
 knowledge_extractor:
   input_file: data_process_pipeline/results/culture_relevance_classifier/output.csv 
+  output_raw: data_process_pipeline/results/output_raw.csv
   output_file: data_process_pipeline/results/knowledge_extractor/output.csv
+  pattern: plain
+  model: mistralai/Mistral-7B-Instruct-v0.2
+  num_samples: -1
+  partition: -1
+  sanity_check: False
+
 
 # convert negation
 negation_converter:
@@ -38,19 +45,30 @@ clustering_component:
 
 # cluster summarizer
 cluster_summarizer:
-  input_file: data_process_pipeline/results/clustering_component/output_filtered.csv
-  output_file: data_process_pipeline/results/clustering_summarizer/output_random1000.json
-  original_before_cluster_file: data_process_pipeline/results/norm_entailment/output.csv
-  openai_model: gpt-3.5-turbo-16k
-  openai_engine: chatgpt0613
-  temperature: 0
-  max_tokens: 500
-  top_p: 0.01
+  input_file: data_process_pipeline/results/clustering_component/group=0.3_sent=0.4_otherdesc=False/output_filtered.csv
+  output_file: data_process_pipeline/results/cluster_summarizer/output.csv
+  original_before_cluster_file: data_process_pipeline/results/negation_converter/output.csv
+  pattern: plain
+  model: mistralai/Mistral-7B-Instruct-v0.2
+  num_samples: -1
+  partition: -1
+  sanity_check: False
+  filter_threshold: -1
 
 # topic normalization
 topic_normalizer:
-  input_file: none
-  output_file: none
+  input_file: data_process_pipeline/results/cluster_summarizer/output.csv
+  output_file: data_process_pipeline/results/topic_normalizer/output.csv
+  output_score_file: data_process_pipeline/results/topic_normalizer/output_score.json
+  cultural_group_threshold: 0.3
+  sbert:
+    model: all-MiniLM-L6-v2
+  openai:
+    model: gpt-3.5-turbo-1106
+    temperature: 0.5
+    max_tokens: 20
+    top_p: 0.3
+    seed: 1234
   
 # agreement calculator
 agreement_calculator:

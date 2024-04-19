@@ -13,18 +13,18 @@ import transformers
 import torch
 import random
 import json
-import argparse
 import logging
 import pandas as pd
 import numpy as np
 
 from utils.util import parse_to_int, process_output
 from utils.prompt_utils import get_mixtral_user_prompt, reencode_prompt_utf16, truncate_to_token_limit, KNOWLEDGE_EXTRACTION_FIELDS
+from pipeline.pipeline_component import PipelineComponent
 
 logger = logging.getLogger(__name__)
 
 
-class ClusteringComponent(PipelineComponent):
+class KnowledgeExtractor(PipelineComponent):
     description = "extracting structured cultural knowledge from social media comments"
     config_layer = "knowledge_extractor"
     
@@ -96,7 +96,12 @@ class ClusteringComponent(PipelineComponent):
             raise NotImplementedError
         
         tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
-        df = pd.read_csv(self._local_config["data_file"])
+        
+        self.tokenizer = tokenizer
+        self.text_model = text_model
+    
+    def run(self):
+        df = pd.read_csv(self._local_config["input_file"])
         
         if self._local_config["num_samples"] != -1:
             df = df.sample(n=self._local_config["num_samples"], replace=False, random_state=1234)
@@ -110,18 +115,14 @@ class ClusteringComponent(PipelineComponent):
                 logger.info('\n')
             df = partitions[self._local_config["partition"]]
 
-            logger.info(f"currently processing {len(df)} clusters")
+            logger.info(f"currently processing {len(df)} records")
             logger.info(df.head())
 
 
         if self.sanity_check:
             df = df.head(5)
-        
-        self.tokenizer = tokenizer
         self.df = df
-        self.text_model = text_model
-    
-    def run(self):
+        
         self.df["has_culture"] = False
         self.df["model_resp"] = ""
         self.df["json_output"] = ""
@@ -129,6 +130,7 @@ class ClusteringComponent(PipelineComponent):
         text_model = self.text_model
         tokenizer = self.tokenizer
 
+        df_results = []
         for idx, row in tqdm(self.df.iterrows(), total=len(self.df)):
             try:
                 df_line = self.df.loc[idx]
@@ -198,21 +200,32 @@ class ClusteringComponent(PipelineComponent):
 
                         self.df.at[idx, "has_culture"] = True
                         for output in outputs:
-                            for field in CULTUREBANK_FIELDS:
-                                assert field in output
+                            df_result = {}
+                            df_result["vid"] = df_line["vid"]
+                            df_result["comment_utc"] = df_line["comment_utc"]
+                            for field in output:
+                                assert field in KNOWLEDGE_EXTRACTION_FIELDS
+                                df_result[field] = output[field]
+                            df_results.append(df_result)
                         self.df.at[idx, "json_output"] = json.dumps(outputs)
 
                         break
                     except Exception as e:
-                        logger.error(e)
+                        # logger.exception()
                         if output_text:
                             logger.error("generated output:")
                             logger.error(output_text)
-                        logger.error(f"error generating output at line {idx}, retrying...")
+                        logger.exception(f"error generating output at line {idx}, retrying...")
             except Exception as e:
-                logger.error(e)
-                logger.error(f"error encountered at line {idx}, continuing...")
+                # logger.exception()
+                logger.exception(f"error encountered at line {idx}, continuing...")
                 continue
+        self.save_output(df_results)
+        logger.info("Knowledge Extraction Done!")
     
-    def save_output(self):
-        self.df.to_csv(self._local_config["output_file"], index=None)
+    def save_output(self, df_results):
+        self.df["vid_unique"] = self.df["vid"].astype(str) + "-" + self.df.index.astype(str)
+        self.df.to_csv(self._local_config["output_raw"], index=None)
+        df_results = pd.DataFrame.from_records(df_results, columns=["vid", "vid_unique", "comment_utc"] + KNOWLEDGE_EXTRACTION_FIELDS)
+        df_results["vid_unique"] = df_results["vid"].astype(str) + "-" + df_results.index.astype(str)
+        df_results.to_csv(self._local_config["output_file"], index=None)

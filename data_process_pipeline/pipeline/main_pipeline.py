@@ -5,16 +5,20 @@ from pipeline.component_negation_converter import NegationConverter
 
 from pipeline.component_clustering import ClusteringComponent
 from pipeline.pipeline_component import PipelineComponent
-
-# from pipeline.component_cluster_summarizer import ClusterSummarizer
+from pipeline.component_knowledge_extractor import KnowledgeExtractor
+from pipeline.component_cluster_summarizer import ClusterSummarizer
+# from pipeline.component_confidence_calculator import ConfidenceCalculator
 from pipeline.component_agreement_calculator import AgreementCalculator
 
 # from pipeline.component_confidence_calculator_for_reddits import (
 #     ConfidenceCalculatorForReddits,
 # )
-from pipeline.component_content_moderation import ContentModeration
+# from pipeline.component_content_moderation import ContentModeration
 
 from pipeline.component_final_formatter import FinalFormatter
+# from pipeline.component_content_filter import ContentFilter
+# from pipeline.component_controversial_filter import ControversialFilter
+from pipeline.component_topic_normalization import TopicNormalizer
 from pipeline.component_culture_relevance_classifier import CultureRelevanceClassifier
 
 logger = logging.getLogger(__name__)
@@ -60,7 +64,7 @@ class Pipeline:
                 f"Possible components: "
                 + str(
                     [
-                        ((i + 1), c.__name__)
+                        ((i), c.__name__)
                         for i, c in enumerate(self.get_possible_components())
                     ]
                 )
@@ -81,6 +85,7 @@ class CultureBankPipeline(Pipeline):
         logger.info("Initializing CultureBankPipeline...")
         os.makedirs(config["result_base_dir"], exist_ok=True)
         self._init_component_dir(config)
+        self._concat_project_base_dir_and_input_output_file(config)
         super().__init__(config)
 
     def _init_component_dir(self, config):
@@ -98,6 +103,7 @@ class CultureBankPipeline(Pipeline):
             for file_type in [
                 "input_file",
                 "output_file",
+                "output_raw",
                 "output_score_file",
                 "output_filtered_file",
                 "original_before_cluster_file",
@@ -114,14 +120,15 @@ class CultureBankPipeline(Pipeline):
     def get_possible_components(cls):
         return [
             CultureRelevanceClassifier,
+            KnowledgeExtractor,
             NegationConverter,
+            # NormEntailment,
             ClusteringComponent,
-            # ClusterSummarizer,
-            AgreementCalculator,
-            ContentModeration,
-            FinalFormatter,
+            ClusterSummarizer,
+            TopicNormalizer,
+            # ConfidenceCalculatorForReddits,
+            # ContentFilter,
             # ControversialFilter,
-            # TopicClustering,
         ]
 
 
