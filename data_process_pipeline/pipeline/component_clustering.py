@@ -71,7 +71,6 @@ class ClusteringComponent(PipelineComponent):
         df = pd.read_csv(self._local_config["input_file"])
         # important, we need to create a unique id here because the same comment can become two separate records in the data
         # if the comment contains two pieces of knowledge, like "In US people tip but in Japan, people don't tip"
-        df["vid_unique"] = df.index.tolist()
         if self._config["dry_run"] is not None:
             df = df.head(self._config["dry_run"])
         return df

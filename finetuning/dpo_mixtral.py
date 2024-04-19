@@ -12,6 +12,12 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, HfArgumentParser, 
 
 from trl import DPOTrainer
 
+"""
+Example Usage:
+
+accelerate launch finetuning/dpo_mixtral.py --model_name_or_path=<your_model_name> --model_type='plain' --output_dir=<output_directory> --max_length 4096 --data_file=<path_to_training_data> --run_name <experiment_name> --warmup_steps 50 --gradient_accumulation_steps 8 --num_train_epochs 2 --report_to='wandb'
+"""
+
 # Define and parse arguments.
 @dataclass
 class ScriptArguments:

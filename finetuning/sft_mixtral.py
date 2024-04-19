@@ -29,6 +29,13 @@ from trl import ModelConfig, SFTTrainer, get_kbit_device_map, get_peft_config, g
 from trl.import_utils import is_npu_available, is_xpu_available
 
 
+"""
+Example Usage:
+
+accelerate launch finetuning/sft_mixtral.py --model_name_or_path=<your_model_name> --output_dir=<output_directory> --max_seq_length 4096 --dataset_name=<name_or_path_to_input_dataset> --run_name <experiment_name> --warmup_steps 500 --gradient_accumulation_steps 16 --num_train_epochs 8
+"""
+
+
 tqdm.pandas()
 @dataclass
 class ScriptArguments:

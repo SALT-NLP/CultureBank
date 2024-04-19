@@ -200,10 +200,10 @@ class KnowledgeExtractor(PipelineComponent):
                         self.df.at[idx, "has_culture"] = True
                         for output in outputs:
                             df_result = {}
-                            df_result["vid_unique"] = df_line["vid_unique"]
+                            df_result["vid"] = df_line["vid"]
                             df_result["comment_utc"] = df_line["comment_utc"]
-                            for field in KNOWLEDGE_EXTRACTION_FIELDS:
-                                assert field in output
+                            for field in output:
+                                assert field in KNOWLEDGE_EXTRACTION_FIELDS
                                 df_result[field] = output[field]
                             df_results.append(df_result)
                         self.df.at[idx, "json_output"] = json.dumps(outputs)
@@ -223,6 +223,8 @@ class KnowledgeExtractor(PipelineComponent):
         logger.info("Knowledge Extraction Done!")
     
     def save_output(self, df_results):
+        self.df["vid_unique"] = self.df["vid"].astype(str) + "-" + self.df.index.astype(str)
         self.df.to_csv(self._local_config["output_raw"], index=None)
-        df_results = pd.DataFrame.from_records(df_results, columns=["vid_unique", "comment_utc"] + KNOWLEDGE_EXTRACTION_FIELDS)
+        df_results = pd.DataFrame.from_records(df_results, columns=["vid", "vid_unique", "comment_utc"] + KNOWLEDGE_EXTRACTION_FIELDS)
+        df_results["vid_unique"] = df_results["vid"].astype(str) + "-" + df_results.index.astype(str)
         df_results.to_csv(self._local_config["output_file"], index=None)

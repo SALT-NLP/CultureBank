@@ -12,7 +12,9 @@ from utils.prompt_utils import FIELD_DEFINITIONS_SUMMARIZED, INCONTEXT_DESC, INC
 from utils.constants import DESC_FIELDS
 
 """
-example usage: python evaluation/convert_to_desc.py
+Example Usage:
+
+python evaluation/convert_to_desc.py --data_file <path_to_culturebank_data> --output_file <output_file>
 """
 
 
