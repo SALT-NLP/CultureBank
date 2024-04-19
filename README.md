@@ -4,12 +4,7 @@ Quick Links: [[dataset-tiktok]](https://huggingface.co/datasets/SALT-NLP/Culture
 #todo:
 # PERSPECTIVE_API_KEY = os.getenv("PERSPECTIVE_API")
 
-## training small classifiers (cultural relevance, and controversial classifier)
-1. if your data need some custimization
-python /sailhome/weiyans/CultureBank/data_process/pipeline/culture_relevance_classification/scripts/train_culture_relevance_classifier.py
-2. distill the summarizer? (ryan? i am not sure if we need to add this code)
-
-# pipeline
+## data_process_pipeline
 ## add some dumb file
 # /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/dummy_data/comments.csv
 CultureBank pipeline execution
@@ -22,12 +17,12 @@ CultureBank pipeline execution
 3.2 content moderation (perspective + provide the controversial one for tiktok + keywords)
 3.3 final touch, PII information
 
-# evaluation code (Ryan)
+## evaluation code (Ryan)
 1. generate the scenario (another adapter)
 2. direction eval
 3. grounded eval
 
-# fine-tuning code (Ryan)
+## fine-tuning code (Ryan)
 0. finetuning
 1. cultureNLI eval
 2. world value eval
