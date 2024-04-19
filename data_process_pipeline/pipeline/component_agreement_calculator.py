@@ -9,7 +9,6 @@ import numpy as np
 from utils.util import parse_to_int
 
 from pipeline.pipeline_component import PipelineComponent
-from utils.constants import CULTUREBANK_FIELDS
 
 
 import logging
@@ -17,7 +16,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class AgreementCalculatorForReddits(PipelineComponent):
+class AgreementCalculator(PipelineComponent):
     description = "Gather the summarization and calculate the agreement among comments"
     config_layer = "agreement_calculator"
 
@@ -29,24 +28,13 @@ class AgreementCalculatorForReddits(PipelineComponent):
             self.check_if_output_exists(self._local_config["output_file"])
 
     def read_input(self):
-        df_before_cluster = pd.read_csv(
-            self._local_config["original_before_cluster_file"]
-        )
-        df_cluster = pd.read_csv(self._local_config["cluster_file"])
-        df_summary = pd.read_csv(self._local_config["cluster_summarization_input_file"])
+        df_summary = pd.read_csv(self._local_config["input_file"])
         if self._config["dry_run"] is not None:
             df_summary = df_summary.iloc[: self._config["dry_run"]]
-        return df_before_cluster, df_cluster, df_summary
+        return df_summary
 
     def run(self):
-        df_before_cluster, df_cluster, df_summary = self.read_input()
-
-        df_summary = pd.merge(
-            df_cluster[["cluster_id", "raw_sample_vids"]],
-            df_summary,
-            on="cluster_id",
-            how="inner",
-        )
+        df_summary = self.read_input()
 
         norm_total_list = []
         norm_confidence_score_list = []
@@ -55,7 +43,9 @@ class AgreementCalculatorForReddits(PipelineComponent):
             df_line = df_summary.iloc[idx]
             norm_confidence_scores = []
             norm_total = 0
-            for norm_value in df_line["raw_sample_norms"]:
+            for norm_value in eval(
+                df_line["raw_sample_norms"].replace("nan", 'float("nan")')
+            ):
                 norm_value = parse_to_int(norm_value)
                 if norm_value is not None:
                     norm_confidence_scores.append(norm_value)

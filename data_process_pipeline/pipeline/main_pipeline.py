@@ -3,18 +3,18 @@ import os
 
 from pipeline.component_negation_converter import NegationConverter
 
-# from pipeline.component_norm_entailment import NormEntailment
 from pipeline.component_clustering import ClusteringComponent
 from pipeline.pipeline_component import PipelineComponent
 
 # from pipeline.component_cluster_summarizer import ClusterSummarizer
-# from pipeline.component_confidence_calculator import ConfidenceCalculator
+from pipeline.component_agreement_calculator import AgreementCalculator
+
 # from pipeline.component_confidence_calculator_for_reddits import (
 #     ConfidenceCalculatorForReddits,
 # )
-# from pipeline.component_content_filter import ContentFilter
-# from pipeline.component_controversial_filter import ControversialFilter
-# from pipeline.component_topic_clustering import TopicClustering
+from pipeline.component_content_moderation import ContentModeration
+
+from pipeline.component_final_formatter import FinalFormatter
 from pipeline.component_culture_relevance_classifier import CultureRelevanceClassifier
 
 logger = logging.getLogger(__name__)
@@ -95,11 +95,11 @@ class CultureBankPipeline(Pipeline):
         return [
             CultureRelevanceClassifier,
             NegationConverter,
-            # NormEntailment,
-            # ClusteringComponent,
+            ClusteringComponent,
             # ClusterSummarizer,
-            # ConfidenceCalculatorForReddits,
-            # ContentFilter,
+            AgreementCalculator,
+            ContentModeration,
+            FinalFormatter,
             # ControversialFilter,
             # TopicClustering,
         ]

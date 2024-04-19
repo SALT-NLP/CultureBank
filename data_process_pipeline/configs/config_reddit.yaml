@@ -27,19 +27,19 @@ clustering_component:
   output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/output.csv
   output_score_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/score.json
   output_filtered_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/output_filtered.csv
-  cultural_group_threshold: 0.3
-  sent_threshold: 0.4
-  min_cluster_size: 5
-  with_other_desc: true
+  cultural_group_threshold: 0.3 # this will be overriden by the parameters in CultureBank/data_process_pipeline/main.py
+  sent_threshold: 0.4  # this will be overriden by the parameters in CultureBank/data_process_pipeline/main.py
+  min_cluster_size: 1
+  with_other_desc: true  # this will be overriden by the parameters in CultureBank/data_process_pipeline/main.py
   annotated_file: none #if you have a file with annotated clusters, feel free to put it here to get an evaluation score
   sbert:
     model: all-MiniLM-L6-v2
 
 # cluster summarizer
 cluster_summarizer:
-  input_file: /sphinx/u/culturebank/reddit_results/clustering_component/output_filtered.csv
-  output_file: /sphinx/u/culturebank/reddit_results/clustering_summarizer/output_random1000.json
-  original_before_cluster_file: /sphinx/u/culturebank/reddit_results/norm_entailment/output.csv
+  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_component/output_filtered.csv
+  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_summarizer/output_random1000.json
+  original_before_cluster_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/norm_entailment/output.csv
   openai_model: gpt-3.5-turbo-16k
   openai_engine: chatgpt0613
   temperature: 0
@@ -51,36 +51,24 @@ topic_normalizer:
   input_file: none
   output_file: none
   
-# /sphinx/u/culturebank/reddit_results/clustering_summarizer/reddit_summarizer_part
+# /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_summarizer/reddit_summarizer_part
 agreement_calculator:
-  original_before_cluster_file: /sphinx/u/culturebank/reddit_results/negation_converter/output_with_unique_ids.csv
-  cluster_file: /sphinx/u/culturebank/reddit_results/clustering_component/group=0.3_sent=0.4_otherdesc=True/output_filtered.csv
-  cluster_summarization_input_file: /sphinx/u/culturebank/reddit_results/clustering_summarizer/reddit_summarizer_combined.csv
-  output_file: /sphinx/u/culturebank/reddit_results/confidence_calculator/output.csv
+  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/clustering_summarizer/output.csv
+  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/agreement_calculator/output.csv
 
-content_filter:
-  input_file: /sphinx/u/culturebank/reddit_results/confidence_calculator/output.csv
-  output_file: /sphinx/u/culturebank/reddit_results/content_filter/output.csv
-  perspective_api_threshold: 0.2
-
-controversial_filter:
-  device: cuda:0
-  input_file: /sphinx/u/culturebank/reddit_results/content_filter/output.csv
-  output_file: /sphinx/u/culturebank/reddit_results/controversial_filter/output.csv
-  output_file_for_manual_annotation: /sphinx/u/culturebank/reddit_results/controversial_filter/output_for_annotation.csv
-  model_dir: /sphinx/u/culturebank/tiktok_data/controversial_data/models/combined_data_distilbert_4
+content_moderation:
+  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/agreement_calculator/output.csv
+  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/content_moderation/output.csv
+  output_file_for_manual_annotation: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/content_moderation/output_for_annotation.csv
+  hard_api_threshold: 0.2 # >=0.2 will be removed without any annotation
+  soft_api_threshold: 0.1 # [0.1, 0.2) will go through a manual check
   keyword_list_dir: /sailhome/weiyans/CultureBank/data_process/scripts/list_of_words.txt
-  perspective_api_threshold: 0.1
-  
-topic_clustering:
-  input_file: /sphinx/u/culturebank/reddit_results/content_filter/output_random200.csv
-  output_file: /sphinx/u/culturebank/reddit_results/topic_clustering/output_random200.csv
-  output_score_file: /sphinx/u/culturebank/reddit_results/topic_clustering/output_random200_score.json
-  cultural_group_threshold: 0.3
-  topic_threshold: 0.6
-  sbert:
-    model: all-MiniLM-L6-v2
+  device: cuda:0
+  controversial_field_name_to_annotate: controversial_or_PII
+  model_dir: /sphinx/u/culturebank/tiktok_data/controversial_data/models/combined_data_distilbert_4/checkpoint-210
 
-annotated_files:
-  annotation_for_whole_pipeline: /sphinx/u/culturebank/reddit_results/annotations/200_for_tiktok_whole_pipelines/200.csv
+final_formatter:
+  input_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/content_moderation/output.csv
+  output_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/final_formatter/output.csv
+  controversial_annotation_file: /sailhome/weiyans/culturebank_public/CultureBank/data_process_pipeline/results/content_moderation/human_annotation.csv
  

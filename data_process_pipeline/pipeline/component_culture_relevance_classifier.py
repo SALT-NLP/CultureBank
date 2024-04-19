@@ -73,6 +73,7 @@ class CultureRelevanceClassifier(PipelineComponent):
         )
         df["pred_label"] = [id2label[int(pred["label"][-1])] for pred in test_pred]
         df["pred_score"] = [round(pred["score"], 2) for pred in test_pred]
+        df = df[df["pred_label"] == "Yes"]
         self.save_output(df)
         logger.info("Prediction Done!")
 

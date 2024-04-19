@@ -69,6 +69,9 @@ class ClusteringComponent(PipelineComponent):
 
     def read_input(self):
         df = pd.read_csv(self._local_config["input_file"])
+        # important, we need to create a unique id here because the same comment can become two separate records in the data
+        # if the comment contains two pieces of knowledge, like "In US people tip but in Japan, people don't tip"
+        df["vid_unique"] = df.index.tolist()
         if self._config["dry_run"] is not None:
             df = df.head(self._config["dry_run"])
         return df
@@ -192,7 +195,6 @@ class ClusteringComponent(PipelineComponent):
                 [clustered_df_unfiltered, pd.DataFrame([new_row])], ignore_index=True
             )
         # Filter out small clusters (which are likely noise)
-
         clustered_df_unfiltered["cluster_id"] = clustered_df_unfiltered.index
         clustered_df_filtered = clustered_df_unfiltered[
             clustered_df_unfiltered["cluster_size"]
@@ -207,9 +209,9 @@ class ClusteringComponent(PipelineComponent):
         vid_unique_annotation = df_annotation[
             ~df_annotation.vid_unique.isnull()
         ].vid_unique.tolist()
-        cluster_annotation = df_annotation[
-            ~df_annotation.vid_unique.isnull()
-        ].cluster_annot.tolist()
+        cluster_annotation = df_annotation[~df_annotation.vid_unique.isnull()][
+            "cluster_annot"
+        ].tolist()
         assert len(vid_unique_annotation) == len(cluster_annotation)
         vid_annotate_cluster_map = {
             vid_unique: int(cluster_id)

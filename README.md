@@ -3,6 +3,9 @@ the code is adapted from https://github.com/cultural-csk/candle
 
 # CultureBank
 
+#todo:
+# PERSPECTIVE_API_KEY = os.getenv("PERSPECTIVE_API")
+
 ## training small classifiers (cultural relevance, and controversial classifier)
 1. if your data need some custimization
 python /sailhome/weiyans/CultureBank/data_process/pipeline/culture_relevance_classification/scripts/train_culture_relevance_classifier.py
@@ -22,7 +25,7 @@ CultureBank pipeline execution
 3.3 final touch, PII information
 
 # evaluation code (Ryan)
-1. generate the scenario
+1. generate the scenario (another adapter)
 2. direction eval
 3. grounded eval
 
@@ -31,4 +34,11 @@ CultureBank pipeline execution
 1. cultureNLI eval
 2. world value eval
 
+# released model
+1. extracgor
+2. summarizer
+3. question generator
+4. culturally aware llm. 
+CultureBank-extracgor
+CultureBank-Summarizer
 
