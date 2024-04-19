@@ -11,6 +11,11 @@ from openai import OpenAI
 from utils.prompt_utils import FIELD_DEFINITIONS_SUMMARIZED, INCONTEXT_DESC, INCONTEXT_EXP, DESC_SYSTEM_PROMPT, DESC_USER_TEMPLATE
 from utils.constants import DESC_FIELDS
 
+"""
+example usage: python evaluation/convert_to_desc.py
+"""
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_file", type=str)

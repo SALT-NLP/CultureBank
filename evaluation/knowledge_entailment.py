@@ -9,6 +9,13 @@ from openai import OpenAI
 from utils.prompt_utils import KNOWLEDGE_ENTAIL_SYSTEM_PROMPT, KNOWLEDGE_ENTAIL_USER_TEMPLATE
 
 
+"""
+Example Usage:
+
+python evaluation/knowledge_entailment.py --data_file <path_to_grounded_eval_output> --output_file <output_path> --model_name <model_under_evaluation>
+"""
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_file", type=str)

@@ -18,6 +18,12 @@ import openai
 from utils.prompt_utils import QUESTION_GENERATION_USER_TEMPLATE, QUESTION_EVAL_SYSTEM_PROMPT, QUESTION_EVAL_USER_TEMPLATE
 
 
+"""
+Example Usage:
+
+python evaluation/generate_questions_aug.py --data_file <cultural_descriptions_file_or_preliminary_questions> --output_file <output_path> --knowledge_file <cultural_descriptions_file> --pattern adapter --model mistralai/Mixtral-8x7B-Instruct-v0.1 --adapters <path_to_customized_adapter> --split full
+"""
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_file", type=str)
@@ -162,9 +168,9 @@ def main():
             messages.append({"role": "user", "content": user_message})
             prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
             json_output = {
-                "Scenario": df_line['scenario'],
-                "Persona": df_line['persona'],
-                "Question": df_line['question'],
+                "Scenario": df_line['scenario'] if 'scenario' in df.columns else "",
+                "Persona": df_line['persona'] if 'persona' in df.columns else "",
+                "Question": df_line['question'] if 'question' in df.columns else "",
             }
             output_text = json.dumps(json_output, indent=4)
             output_row = {}

@@ -19,6 +19,11 @@ from utils.constants import EVAL_FIELDS
 from utils.prompt_utils import FIELD_DEFINITIONS, DIRECT_EVAL_PROMPT_TEMPLATE
 from utils.util import extract_yes_or_no
 
+"""
+Example Usage:
+
+python evaluation/direct_eval.py --data_file <path_to_your_culturebank_data> --output_file <output_path> --pattern plain --model mistralai/Mistral-7B-Instruct-v0.2
+"""
 
 def main():
     parser = argparse.ArgumentParser()

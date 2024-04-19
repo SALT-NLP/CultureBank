@@ -12,6 +12,12 @@ import numpy as np
 from utils.util import parse_to_int
 from utils.prompt_utils import truncate_to_token_limit, GROUNDED_EVAL_PROMPT_TEMPLATE
 
+"""
+Example Usage:
+
+python evaluation/grounded_eval_gpt.py --data_file <path_to_cultural_questions> --output_file <output_path> --pattern plain --model gpt-4-1106-preview --split full
+"""
+
 
 def main():
     parser = argparse.ArgumentParser()

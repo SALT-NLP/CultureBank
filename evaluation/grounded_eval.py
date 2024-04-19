@@ -16,6 +16,12 @@ from utils.util import parse_to_int
 from utils.prompt_utils import truncate_to_token_limit, GROUNDED_EVAL_PROMPT_TEMPLATE, GROUNDED_EVAL_PROMPT_AUG_TEMPLATE
 
 
+"""
+Example Usage:
+
+python evaluation/benchmark.py --data_file <path_to_cultural_questions> --output_file <output_path> --pattern plain --model meta-llama/Llama-2-7b-chat-hf
+"""
+
 
 def main():
     parser = argparse.ArgumentParser()

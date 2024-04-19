@@ -15,6 +15,11 @@ from utils.constants import EVAL_FIELDS
 from utils.prompt_utils import FIELD_DEFINITIONS, DIRECT_EVAL_PROMPT_TEMPLATE
 from utils.util import extract_yes_or_no
 
+"""
+Example Usage:
+
+python evaluation/direct_eval_gpt.py --data_file <path_to_culturebank_data> --output_file <output_path> --model gpt-4-1106-preview
+"""
 
 def main():
     parser = argparse.ArgumentParser()

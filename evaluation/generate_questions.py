@@ -14,6 +14,12 @@ import torch
 
 from utils.prompt_utils import QUESTION_GENERATION_USER_TEMPLATE
 
+"""
+Example Usage:
+
+python evaluation/generate_questions.py --data_file <cultural_descriptions_file> --output_file <output_path> --pattern adapter --model mistralai/Mixtral-8x7B-Instruct-v0.1 --adapters <path_to_customized_adapter> --split full
+"""
+
 
 def main():
     parser = argparse.ArgumentParser()
