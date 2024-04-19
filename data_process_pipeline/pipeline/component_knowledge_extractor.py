@@ -210,14 +210,14 @@ class KnowledgeExtractor(PipelineComponent):
 
                         break
                     except Exception as e:
-                        logger.error(e)
+                        # logger.exception()
                         if output_text:
                             logger.error("generated output:")
                             logger.error(output_text)
-                        logger.error(f"error generating output at line {idx}, retrying...")
+                        logger.exception(f"error generating output at line {idx}, retrying...")
             except Exception as e:
-                logger.error(e)
-                logger.error(f"error encountered at line {idx}, continuing...")
+                # logger.exception()
+                logger.exception(f"error encountered at line {idx}, continuing...")
                 continue
         self.save_output(df_results)
         logger.info("Knowledge Extraction Done!")

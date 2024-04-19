@@ -198,13 +198,18 @@ class ClusterSummarizer(PipelineComponent):
                             df_results.append(res)
                             break
                     except Exception as e:
-                        logger.error(e)
-                        logger.error("generated output:")
-                        logger.error(output_text)
-                        logger.error(f"error generating output at cluster {df_line['cluster_id']}, retrying...")
+                        # logger.error(e)
+                        # logger.error("generated output:")
+                        # logger.error(output_text)
+                        # logger.error(f"error generating output at cluster {df_line['cluster_id']}, retrying...")
+                        if output_text:
+                            logger.error("generated output:")
+                            logger.error(output_text)
+                        logger.exception(f"error generating output at line {idx}, retrying...")
             except Exception as e:
-                logger.error(e)
-                logger.error(f"error encountered at cluster {idx}, continuing...")
+                # logger.error(e)
+                # logger.error(f"error encountered at cluster {idx}, continuing...")
+                logger.exception(f"error encountered at line {idx}, continuing...")
                 continue
         self.save_output(df_results)
         logger.info("Cluster Summarization Done!")
