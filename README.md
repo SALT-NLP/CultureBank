@@ -18,9 +18,12 @@ CultureBank pipeline execution
 3.3 final touch, PII information
 
 ## evaluation code (Ryan)
-1. generate the scenario (another adapter)
-2. direction eval
-3. grounded eval
+1. `evaluation/convert_to_desc.py`: concatenates the fields in culturebank data and translates them into paragraphs of cultural descriptions.
+2. `evaluation/generate_questions.py`: generates questions for grounded evaluation based on the cultural descriptions.
+3. `evaluation/generate_questions_aug.py`: generates questions for grounded evaluation based on the cultural descriptions with self-refinement method.
+4. `evaluation/grounded_eval.py`: performs grounded evaluation on language models on the generated cultural questions.
+5. `evaluation/knowledge_entailment.py`: computes the knowledge entailment scores of models in the grounded evaluations.
+6. `evaluation/direct_eval.py`: performs direct evaluation on language models on CultureBank data.
 
 ## fine-tuning code (Ryan)
 0. finetuning
