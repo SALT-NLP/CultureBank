@@ -50,7 +50,6 @@ class ClusterSummarizer(PipelineComponent):
                 text_model = AutoModelForCausalLM.from_pretrained(
                     model_name,
                     torch_dtype=torch.bfloat16,
-                    load_in_4bit=True,
                     device_map={"": 0},
                     quantization_config=BitsAndBytesConfig(
                         load_in_4bit=True,
