@@ -37,7 +37,7 @@ class ClusterSummarizer(PipelineComponent):
         self._local_config = config[self.config_layer]
         self.sanity_check = self._local_config["sanity_check"]
 
-    def _init_model(self):
+    def _load_model(self):
         model_name = self._local_config["model"]
 
         if self._local_config["pattern"] == "adapter":
@@ -110,7 +110,7 @@ class ClusterSummarizer(PipelineComponent):
         self.tokenizer = tokenizer
 
     def run(self):
-        self._init_model()
+        self._load_model()
         df = pd.read_csv(self._local_config["input_file"])
         random.seed(123)
 
@@ -254,6 +254,13 @@ class ClusterSummarizer(PipelineComponent):
                 logger.exception(f"error encountered at line {idx}, continuing...")
                 continue
 
+        # clean up resources
+        del self.text_model
+        del self.tokenizer
+        del text_model
+        del tokenizer
+        
+        # storing results
         df_results = pd.DataFrame.from_records(
             df_results, columns=["cluster_id"] + SUMMARIZER_FIELDS + ["topic"]
         )
