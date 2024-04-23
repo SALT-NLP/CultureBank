@@ -13,11 +13,12 @@ result_base_dir: ./data_process_pipeline/results
 
 # llm-based knowledge extractor
 1_knowledge_extractor:
-  input_file: data_process_pipeline/results/0_culture_relevance_classifier/output.csv 
-  output_raw: data_process_pipeline/results/1_knowledge_extractor/output_raw.csv
-  output_file: data_process_pipeline/results/1_knowledge_extractor/output.csv
-  pattern: plain
-  model: mistralai/Mistral-7B-Instruct-v0.2
+  input_file: data_process_pipeline/results/culture_relevance_classifier/output.csv 
+  output_raw: data_process_pipeline/results/output_raw.csv
+  output_file: data_process_pipeline/results/knowledge_extractor/output.csv
+  pattern: adapter
+  model: mistralai/Mixtral-8x7B-Instruct-v0.1
+  adapters: [SALT-NLP/CultureBank-Extractor]
   num_samples: -1
   partition: -1
   sanity_check: False
@@ -47,8 +48,9 @@ result_base_dir: ./data_process_pipeline/results
   input_file: data_process_pipeline/results/3_clustering_component/group=0.3_sent=0.4_otherdesc=False/output_filtered.csv
   output_file: data_process_pipeline/results/4_cluster_summarizer/output.csv
   original_before_cluster_file: data_process_pipeline/results/1_knowledge_extractor/output.csv
-  pattern: plain
+  pattern: adapter
   model: mistralai/Mistral-7B-Instruct-v0.2
+  adapters: [SALT-NLP/CultureBank-Summarizer]
   num_samples: -1
   partition: -1
   sanity_check: False
