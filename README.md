@@ -6,7 +6,7 @@ Quick Links: [[Paper]]() [[Project Page]](https://culturebank.github.io/) [[data
 
 We provide:
 - an easy-to-use and generalizable [pipeline](data_process_pipeline/pipeline) to construct cultural knowledge bank from online communities
-- two cultural knowledge datasets, [[CultureBank-TikTok]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_tiktok.csv) [[CultureBank-Reddit]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_reddit.csv)
+- two cultural knowledge datasets, [[CultureBank-TikTok]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_tiktok.csv) and [[CultureBank-Reddit]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_reddit.csv)
 - [grounded cultural evaluation](evaluation/) and [fine-tuning](finetuning/) scripts
 
 ## Setup
