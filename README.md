@@ -69,6 +69,11 @@ python data_process_pipeline/main.py -i 0 -c ./data_process_pipeline/configs/con
 
 
 ## Evaluation scripts
+
+
+![alt text](figures/eval.png)
+
+
 1. [`evaluation/convert_to_desc.py`](evaluation/convert_to_desc.py): concatenates the fields in CultureBank data and translates them into free-text paragraphs of cultural descriptors.
 2. [`evaluation/generate_questions.py`](evaluation/generate_questions.py): generates questions for grounded evaluation based on the cultural descriptors. The released adapter is [here](https://huggingface.co/SALT-NLP/CultureBank-Question-Generator).
 3. [`evaluation/generate_questions_aug.py`](evaluation/generate_questions_aug.py): generates questions for grounded evaluation based on the cultural descriptions with self-refinement method (very similar to `evaluation/generate_questions.py`, the only difference is that GPT-4 will score the generated question until max trials or good results). The released adapter is [here](https://huggingface.co/SALT-NLP/CultureBank-Question-Generator).
