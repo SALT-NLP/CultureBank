@@ -1,16 +1,19 @@
 # CultureBank
-Quick Links: [[dataset-tiktok]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_tiktok.csv) [[dataset-reddit]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_reddit.csv) [[Models]](https://huggingface.co/collections/SALT-NLP/culturebank-6626ee7dcd54f5fffb6769fe) [[Project Page]](https://culturebank.github.io/) [[Paper]]()
+Quick Links: [[Paper]]() [[Project Page]](https://culturebank.github.io/) [[dataset-tiktok]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_tiktok.csv) [[dataset-reddit]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_reddit.csv) [[Models]](https://huggingface.co/collections/SALT-NLP/culturebank-6626ee7dcd54f5fffb6769fe) 
 
 ## Setup
 1. Setup the environment
 
-- `conda env create -f environment.yml`
+`conda env create -f environment.yml`
+
 2. Setup the api keys
+
 - [OpenAI](https://openai.com/blog/openai-api): `os.getenv("OPENAI_API_KEY")`
+
 - [Perspective api](https://perspectiveapi.com/how-it-works/): `os.getenv("PERSPECTIVE_API")`
 
 
-## Data Process Pipeline
+## Data process pipeline
 The pipeline contains 9 components (see [`data_process_pipeline/pipeline/main_pipeline.py`](data_process_pipeline/pipeline/main_pipeline.py))
 
 0. [`data_process_pipeline/pipeline/component_0_culture_relevance_classifier.py`](data_process_pipeline/pipeline/component_0_culture_relevance_classifier.py): classify if a comment is related to culture 
@@ -25,13 +28,13 @@ The pipeline contains 9 components (see [`data_process_pipeline/pipeline/main_pi
 
 
 
-**How to run the pipeline:**
+## How to run the pipeline
 
 We prepare a [`dummy data file`](data_process_pipeline/dummy_data/comments.csv), and this command will run the components with index 0,1,3,4,5,6,7,8 in order (except for the optional 2nd negation converter component) with the config [`config_dummy_data_vanilla_mistral.yaml`](data_process_pipeline/configs/config_dummy_data_vanilla_mistral.yaml)
 ```
-python data_process_pipeline/main.py -i 0,1,3,4,5,6,7,8 -c ./data_process_pipeline/configs/config_dummy_data.yaml
+python data_process_pipeline/main.py -i 0,1,3,4,5,6,7,8 -c ./data_process_pipeline/configs/config_dummy_data_vanilla_mistral.yaml
 ```
-The final output will be at `data_process_pipeline/results/8_final_formatter/output.csv`, as specified in [`config_dummy_data.yaml`](./data_process_pipeline/configs/config_dummy_data.yaml). 
+The final output will be at `data_process_pipeline/results/8_final_formatter/output.csv`, as specified in [`config_dummy_data_vanilla_mistral.yaml`](./data_process_pipeline/configs/config_dummy_data_vanilla_mistral.yaml). 
 
 **How to run individual component**
 
@@ -39,7 +42,7 @@ We can also run individual components, but need to make sure the input file exis
 
 ```
 # load the 0th component, relevance_classifier
-python data_process_pipeline/main.py -i 0 -c ./data_process_pipeline/configs/config_dummy_data.yaml
+python data_process_pipeline/main.py -i 0 -c ./data_process_pipeline/configs/config_dummy_data_vanilla_mistral.yaml
 ```
 
 **Some notes**
@@ -58,8 +61,8 @@ python data_process_pipeline/main.py -i 0 -c ./data_process_pipeline/configs/con
 6. [`evaluation/direct_eval.py`](evaluation/direct_eval.py): performs direct evaluation on language models on CultureBank data.
 
 ## Fine-tuning scripts
-1. `finetuning/sft_mixtral.py`: a sample script to supervised-finetune a mixtral model on various tasks (extractor, summarizer, culturally-aware model, etc) with proper data preparation. 
-2. `finetuning/dpo_mixtral.py`: a sample script to train a mixtral model with DPO on various tasks (culturally-aware model, etc) with proper data preparation. 
+1. [`finetuning/sft_mixtral.py`](finetuning/sft_mixtral.py): a sample script to supervised-finetune a mixtral model on various tasks (extractor, summarizer, culturally-aware model, etc) with proper data preparation. 
+2. [`finetuning/dpo_mixtral.py`](finetuning/dpo_mixtral.py): a sample script to train a mixtral model with DPO on various tasks (culturally-aware model, etc) with proper data preparation. 
 
 ## Released models
 1. [Knowledge extractor](https://huggingface.co/SALT-NLP/CultureBank-Extractor)
