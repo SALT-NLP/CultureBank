@@ -1,12 +1,10 @@
 # CultureBank
 Quick Links: [[dataset-tiktok]](https://huggingface.co/datasets/SALT-NLP/CultureBank-TikTok) [[dataset-reddit]](https://huggingface.co/datasets/SALT-NLP/CultureBank-Reddit) [[Models](https://huggingface.co/datasets/SALT-NLP/CultureBank-Reddit)] [[Project Page]](https://salt-nlp.github.io/Design2Code/) [[Paper]](https://salt-nlp.github.io/Design2Code/)
 
-## setup
-`conda env create -f environment.yml
-python data_process_pipeline/main.py -i 0,1,3,4,5,6,7,8 -c ./data_process_pipeline/configs/config_dummy_data.yaml
-`
-#todo:
-# PERSPECTIVE_API_KEY = os.getenv("PERSPECTIVE_API")
+### setup
+`conda env create -f environment.yml`
+
+`python data_process_pipeline/main.py -i 0,1,3,4,5,6,7,8 -c ./data_process_pipeline/configs/config_dummy_data.yaml`
 
 ## data_process_pipeline
 ## add some dumb file
@@ -23,8 +21,8 @@ CultureBank pipeline execution
 
 ## evaluation code (Ryan)
 1. `evaluation/convert_to_desc.py`: concatenates the fields in culturebank data and translates them into paragraphs of cultural descriptions.
-2. `evaluation/generate_questions.py`: generates questions for grounded evaluation based on the cultural descriptions.
-3. `evaluation/generate_questions_aug.py`: generates questions for grounded evaluation based on the cultural descriptions with self-refinement method.
+2. `evaluation/generate_questions.py`: generates questions for grounded evaluation based on the cultural descriptions. The released adapter is [here](https://huggingface.co/SALT-NLP/CultureBank-Question-Generator).
+3. `evaluation/generate_questions_aug.py`: generates questions for grounded evaluation based on the cultural descriptions with self-refinement method. The released adapter is [here](https://huggingface.co/SALT-NLP/CultureBank-Question-Generator).
 4. `evaluation/grounded_eval.py`: performs grounded evaluation on language models on the generated cultural questions.
 5. `evaluation/knowledge_entailment.py`: computes the knowledge entailment scores of models in the grounded evaluations.
 6. `evaluation/direct_eval.py`: performs direct evaluation on language models on CultureBank data.
