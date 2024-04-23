@@ -36,14 +36,17 @@ The pipeline contains 9 components (see [`data_process_pipeline/pipeline/main_pi
 
 
 ## How to run the pipeline
+1. Prepare a data file, e.g., the provided [`dummy data file`](data_process_pipeline/dummy_data/comments.csv)
 
-We prepare a [`dummy data file`](data_process_pipeline/dummy_data/comments.csv), and this command will run the components with index 0,1,3,4,5,6,7,8 in order (except for the optional 2nd negation converter component) with the config [`config_dummy_data_vanilla_mistral.yaml`](data_process_pipeline/configs/config_dummy_data_vanilla_mistral.yaml)
+2. Set up the paths in the config, e.g., the provided  [`config_dummy_data_vanilla_mistral.yaml`](data_process_pipeline/configs/config_dummy_data_vanilla_mistral.yaml)
+
+3. Run this command to run the components with index 0,1,3,4,5,6,7,8 in order with the config 
 ```
 python data_process_pipeline/main.py -i 0,1,3,4,5,6,7,8 -c ./data_process_pipeline/configs/config_dummy_data_vanilla_mistral.yaml
 ```
-The final output will be at `data_process_pipeline/results/8_final_formatter/output.csv`, as specified in [`config_dummy_data_vanilla_mistral.yaml`](./data_process_pipeline/configs/config_dummy_data_vanilla_mistral.yaml). 
+4. The final output will be at `data_process_pipeline/results/8_final_formatter/output.csv`, as specified in [`config_dummy_data_vanilla_mistral.yaml`](./data_process_pipeline/configs/config_dummy_data_vanilla_mistral.yaml). 
 
-**How to run individual component**
+**How to run individual components**
 
 We can also run individual components, but need to make sure the input file exists. 
 
