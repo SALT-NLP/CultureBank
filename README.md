@@ -1,6 +1,6 @@
-# <img src="figures/image.png" width="36" height="36"> CultureBank 
+# <img src="figures/logo.png" width="36" height="36"> CultureBank 
 Quick Links: [[Paper]]() [[Project Page]](https://culturebank.github.io/) [[dataset-tiktok]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_tiktok.csv) [[dataset-reddit]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_reddit.csv) [[Models]](https://huggingface.co/collections/SALT-NLP/culturebank-6626ee7dcd54f5fffb6769fe) 
-<img src="figures/intro.png" width="900" height="180"> 
+![alt text](figures/intro.png)
 ## Setup
 1. Setup the environment
 
@@ -14,7 +14,7 @@ Quick Links: [[Paper]]() [[Project Page]](https://culturebank.github.io/) [[data
 
 
 ## Data process pipeline
-
+![alt text](figures/pipeline.png)
 The pipeline contains 9 components (see [`data_process_pipeline/pipeline/main_pipeline.py`](data_process_pipeline/pipeline/main_pipeline.py)).
 
 0. [`data_process_pipeline/pipeline/component_0_culture_relevance_classifier.py`](data_process_pipeline/pipeline/component_0_culture_relevance_classifier.py): classify if a comment is related to culture 
