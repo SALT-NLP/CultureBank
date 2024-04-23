@@ -1,7 +1,0 @@
-vid_unique,comment_utc,comment_content,pred_label,pred_score
-0,1609477200,I traveled to America and tipping is a big cultural shock for me there,Yes,0.84
-1,1546300800,Tipping culture is big in America,Yes,0.52
-2,1640995200,People in China use a lot of cashless payment like AliPay,Yes,0.88
-3,1672531200,Tipping is optional in Australia,Yes,0.72
-4,1483228800,you can make a tip in high-end places in Australia,Yes,0.51
-5,1483228284,cool post,No,0.82

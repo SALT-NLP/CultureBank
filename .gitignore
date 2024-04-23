@@ -1,3 +1,4 @@
 results/
 data_process_pipeline/results/
+data_process_pipeline/results_test/
 *.pyc
