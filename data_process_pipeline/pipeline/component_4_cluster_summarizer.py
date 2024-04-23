@@ -37,6 +37,7 @@ class ClusterSummarizer(PipelineComponent):
         self._local_config = config[self.config_layer]
         self.sanity_check = self._local_config["sanity_check"]
 
+    def _init_model(self):
         model_name = self._local_config["model"]
 
         if self._local_config["pattern"] == "adapter":
@@ -109,6 +110,7 @@ class ClusterSummarizer(PipelineComponent):
         self.tokenizer = tokenizer
 
     def run(self):
+        self._init_model()
         df = pd.read_csv(self._local_config["input_file"])
         random.seed(123)
 
