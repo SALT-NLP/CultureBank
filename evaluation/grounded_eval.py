@@ -1,7 +1,7 @@
 """
 Example Usage:
 
-python evaluation/benchmark.py --data_file <path_to_cultural_questions> --output_file <output_path> --pattern plain --model meta-llama/Llama-2-7b-chat-hf
+python evaluation/benchmark.py --data_file <path_to_cultural_questions> --output_file <output_path> --knowledge_file <path_to_cultural_descriptions> --pattern plain --model meta-llama/Llama-2-7b-chat-hf
 """
 
 from transformers import AutoTokenizer
@@ -30,6 +30,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_file", type=str)
     parser.add_argument("--output_file", type=str)
+    parser.add_argument("--knowledge_file", type=str)
     parser.add_argument(
         "--pattern", type=str, choices=["merged", "adapter", "plain", "awq"]
     )
@@ -125,9 +126,7 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
 
     df = pd.read_csv(args.data_file)
-    knowledge = pd.read_csv(
-        "/sphinx/u/culturebank/tiktok_results/evaluation/cultural_descriptions_v2.csv"
-    )
+    knowledge = pd.read_csv(args.knowledge_file)
 
     if not args.all_questions:
         # Group by 'cluster_id' and select the first row from each group
