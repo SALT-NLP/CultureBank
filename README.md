@@ -3,6 +3,7 @@ Quick Links: [[dataset-tiktok]](https://huggingface.co/datasets/SALT-NLP/Culture
 
 ## setup
 `conda env create -f environment.yml
+python data_process_pipeline/main.py -i 0,1,3,4,5,6,7,8 -c ./data_process_pipeline/configs/config_dummy_data.yaml
 `
 #todo:
 # PERSPECTIVE_API_KEY = os.getenv("PERSPECTIVE_API")
