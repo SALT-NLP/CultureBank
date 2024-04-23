@@ -40,6 +40,7 @@ class KnowledgeExtractor(PipelineComponent):
         self._local_config = config[self.config_layer]
         self.sanity_check = self._local_config["sanity_check"]
 
+    def _load_model(self):
         model_name = self._local_config["model"]
         tokenizer_path = (
             self._local_config["tokenizer"]
@@ -112,6 +113,7 @@ class KnowledgeExtractor(PipelineComponent):
         self.text_model = text_model
 
     def run(self):
+        self._load_model()
         df = pd.read_csv(self._local_config["input_file"])
 
         if self._local_config["num_samples"] != -1:

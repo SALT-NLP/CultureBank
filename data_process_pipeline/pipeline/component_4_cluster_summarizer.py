@@ -37,6 +37,7 @@ class ClusterSummarizer(PipelineComponent):
         self._local_config = config[self.config_layer]
         self.sanity_check = self._local_config["sanity_check"]
 
+    def _init_model(self):
         model_name = self._local_config["model"]
 
         if self._local_config["pattern"] == "adapter":
@@ -50,7 +51,6 @@ class ClusterSummarizer(PipelineComponent):
                 text_model = AutoModelForCausalLM.from_pretrained(
                     model_name,
                     torch_dtype=torch.bfloat16,
-                    load_in_4bit=True,
                     device_map={"": 0},
                     quantization_config=BitsAndBytesConfig(
                         load_in_4bit=True,
@@ -110,6 +110,7 @@ class ClusterSummarizer(PipelineComponent):
         self.tokenizer = tokenizer
 
     def run(self):
+        self._init_model()
         df = pd.read_csv(self._local_config["input_file"])
         random.seed(123)
 

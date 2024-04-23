@@ -52,7 +52,6 @@ tqdm.pandas()
 @dataclass
 class ScriptArguments:
     dataset_name: str = field(
-        default="/sphinx/u/culturebank/tiktok_data/mixtral_sft_v1.csv",
         metadata={"help": "the dataset name"},
     )
     dataset_text_field: str = field(
