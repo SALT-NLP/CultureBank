@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 class ClusteringComponent(PipelineComponent):
     description = "clustering the extracted and processed knowledge"
-    config_layer = "clustering_component"
+    config_layer = "3_clustering_component"
 
     def __init__(self, config: dict):
         super().__init__(config)
@@ -83,8 +83,6 @@ class ClusteringComponent(PipelineComponent):
             df, raw_clusters
         )
 
-        if self._local_config["annotated_file"] != "none":
-            self.evaluate_cluster_with_annotation(clustered_df_unfiltered)
         self.save_output(clustered_df_filtered, clustered_df_unfiltered)
         logger.info("Clustering Done!")
 
@@ -202,55 +200,3 @@ class ClusteringComponent(PipelineComponent):
         print(f"num clusters before filtering: {len(clustered_df_unfiltered)}")
         print(f"num clusters after filtering: {len(clustered_df_filtered)}")
         return clustered_df_filtered, clustered_df_unfiltered
-
-    def evaluate_cluster_with_annotation(self, clustered_df_unfiltered):
-        df_annotation = pd.read_csv(self._local_config["annotated_file"])
-        vid_unique_annotation = df_annotation[
-            ~df_annotation.vid_unique.isnull()
-        ].vid_unique.tolist()
-        cluster_annotation = df_annotation[~df_annotation.vid_unique.isnull()][
-            "cluster_annot"
-        ].tolist()
-        assert len(vid_unique_annotation) == len(cluster_annotation)
-        vid_annotate_cluster_map = {
-            vid_unique: int(cluster_id)
-            for vid_unique, cluster_id in zip(vid_unique_annotation, cluster_annotation)
-        }
-        vid_original_cluster_map = {}
-        for vid_unique in vid_annotate_cluster_map:
-            original_cluster_id = clustered_df_unfiltered[
-                clustered_df_unfiltered.raw_sample_vids.astype(str).str.contains(
-                    vid_unique
-                )
-            ].cluster_id.values.item()
-            vid_original_cluster_map[vid_unique] = original_cluster_id
-        old_to_annotate_cluster_id_map = {}
-        for vid_unique in vid_annotate_cluster_map:
-            annotated_cluster_id = vid_annotate_cluster_map[vid_unique]
-            original_cluster_id = vid_original_cluster_map[vid_unique]
-            if (original_cluster_id not in old_to_annotate_cluster_id_map) and (
-                annotated_cluster_id not in old_to_annotate_cluster_id_map.values()
-            ):
-                # original cluster is new in the map, and the annotated cluster is also new in the map
-                old_to_annotate_cluster_id_map[original_cluster_id] = (
-                    annotated_cluster_id
-                )
-            elif annotated_cluster_id in old_to_annotate_cluster_id_map.values():
-                # the annotated cluster already appears in the map
-                for key in old_to_annotate_cluster_id_map:
-                    if old_to_annotate_cluster_id_map[key] == annotated_cluster_id:
-                        mapped_cluster_id = key
-                if original_cluster_id != mapped_cluster_id:
-                    old_to_annotate_cluster_id_map[original_cluster_id] = (
-                        original_cluster_id
-                    )
-        y_true = []
-        y_pred = []
-        for vid_unique in vid_annotate_cluster_map:
-            y_true.append(vid_annotate_cluster_map[vid_unique])
-            y_pred.append(
-                old_to_annotate_cluster_id_map[vid_original_cluster_map[vid_unique]]
-            )
-        text = classification_report(y_true, y_pred)
-        self.scores["clf_report"] = text
-        logger.info(text)

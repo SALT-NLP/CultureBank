@@ -2,7 +2,7 @@
 Final touch
 """
 
-import spacy
+import os
 import pandas as pd
 
 # from profanity_check import predict, predict_prob
@@ -32,7 +32,7 @@ def count_to_bin(count):
 
 class FinalFormatter(PipelineComponent):
     description = "Final data prepration"
-    config_layer = "final_formatter"
+    config_layer = "8_final_formatter"
 
     def __init__(self, config: dict):
         super().__init__(config)
@@ -40,7 +40,7 @@ class FinalFormatter(PipelineComponent):
         # get local config
         self.config = config
         self._local_config = config[self.config_layer]
-        self._min_cluster_size = config["clustering_component"]["min_cluster_size"]
+        self._min_cluster_size = config["3_clustering_component"]["min_cluster_size"]
         if "output_file" in self._local_config:
             self.check_if_output_exists(self._local_config["output_file"])
 
@@ -75,8 +75,10 @@ class FinalFormatter(PipelineComponent):
         df["agreement"] = df["norm"].round(1)
 
         # bin the cluster size
-        bins = [5] + list(
-            range(20, math.ceil(df["cluster_size"].max() / 10) * 10 + 1, 10)
+        bins = (
+            [1]
+            + [5]
+            + list(range(20, math.ceil(df["cluster_size"].max() / 10) * 10 + 1, 10))
         )
         labels = [f"[{bins[i]}, {bins[i+1]})" for i in range(len(bins) - 1)]
         df["num_support_bin"] = pd.cut(
@@ -89,7 +91,7 @@ class FinalFormatter(PipelineComponent):
         df_final = df[
             [
                 "cluster_id",
-                # "representative_cultural group",
+                "representative_cultural group",
                 "context",
                 "goal",
                 "relation",
@@ -98,7 +100,7 @@ class FinalFormatter(PipelineComponent):
                 "recipient",
                 "recipient's behavior",
                 "other descriptions",
-                # "representative_topic",
+                "representative_topic",
                 "agreement",
                 "num_support_bin",
                 "time_range",
@@ -106,7 +108,7 @@ class FinalFormatter(PipelineComponent):
         ]
         df_final.columns = [
             "cluster_id",
-            # "cultural group",
+            "cultural group",
             "context",
             "goal",
             "relation",
@@ -115,14 +117,15 @@ class FinalFormatter(PipelineComponent):
             "recipient",
             "recipient_behavior",
             "other_descriptions",
-            # "topic",
+            "topic",
             "agreement",
             "num_support_bin",
             "time_range",
         ]
 
         # filter controversial data
-        if self._local_config["controversial_annotation_file"] is not None:
+        if os.path.exists(self._local_config["controversial_annotation_file"]):
+            logger.info(f"accessing the annotated controversial data now!")
             df_controversial_annotated = pd.read_csv(
                 self._local_config["controversial_annotation_file"]
             )
@@ -138,6 +141,8 @@ class FinalFormatter(PipelineComponent):
                     ].cluster_id
                 )
             ]
+        else:
+            logger.info(f"there is no annotated controversial data!")
 
         self.save_output(
             df_final,

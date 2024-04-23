@@ -1,7 +1,3 @@
-"""
-cd data_process
-python pipeline/component_norm_entailment.py
-"""
 import spacy
 import pandas as pd
 import torch
@@ -38,13 +34,13 @@ from utils.clustering import (
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI()
-nltk.download('wordnet')
+nltk.download("wordnet")
 logger = logging.getLogger(__name__)
 
 
 class TopicNormalizer(PipelineComponent):
     description = "normalizing the topics and cultural groups"
-    config_layer = "topic_normalizer"
+    config_layer = "5_topic_normalizer"
 
     def __init__(self, config: dict):
         super().__init__(config)
@@ -98,9 +94,9 @@ class TopicNormalizer(PipelineComponent):
         df = self.select_representative_summarization(
             df, "cultural group", group_clusters
         )
-        
+
         df = self.topic_normalization(df)
-        
+
         self.save_output(df)
         logger.info("Normalization Done!")
 
@@ -112,8 +108,7 @@ class TopicNormalizer(PipelineComponent):
         )
         with open(self._local_config["output_score_file"], "w") as fh:
             json.dump(self.scores, fh)
-    
-    
+
     def cultural_group_normalization(self, df):
         sents = [f"{df.iloc[idx]['cultural group']}" for idx, row in df.iterrows()]
         logger.info(f"this many culture groups: {len(sents)}")
@@ -133,9 +128,8 @@ class TopicNormalizer(PipelineComponent):
 
         return raw_clusters
 
-
     def topic_normalization(self, df):
-        df['representative_topic'] = ""
+        df["representative_topic"] = ""
         model = self._local_config["openai"]["model"]
         temperature = self._local_config["openai"]["temperature"]
         max_tokens = self._local_config["openai"]["max_tokens"]
@@ -147,9 +141,12 @@ class TopicNormalizer(PipelineComponent):
                 try:
                     df_line = df.iloc[idx]
                     system_message = TOPIC_SYSTEM_MESSAGE.format(CULTURAL_TOPICS)
-                    user_message = TOPIC_USER_MESSAGE_TEMPLATE.format(df_line['topic'])
-                    messages = [{"role": "system", "content": system_message}, {"role": "user", "content": user_message}]
-                    
+                    user_message = TOPIC_USER_MESSAGE_TEMPLATE.format(df_line["topic"])
+                    messages = [
+                        {"role": "system", "content": system_message},
+                        {"role": "user", "content": user_message},
+                    ]
+
                     response = client.chat.completions.create(
                         model=model,
                         messages=messages,
@@ -160,17 +157,19 @@ class TopicNormalizer(PipelineComponent):
                     )
                     response_content = response.choices[0].message.content
                     prompt_tokens = response.usage.prompt_tokens
-                    
+
                     summarized_topic = response_content.strip()
-                    summarized_topic = re.sub(r'[\'"]', '', summarized_topic)
-                    summarized_topic = re.sub(r'\.$', '', summarized_topic)
+                    summarized_topic = re.sub(r'[\'"]', "", summarized_topic)
+                    summarized_topic = re.sub(r"\.$", "", summarized_topic)
                     if summarized_topic not in CULTURAL_TOPICS:
-                        print(f"row {idx}: the summarized topic {summarized_topic} does not fit into any of the predefined themes, retrying...")
+                        print(
+                            f"row {idx}: the summarized topic {summarized_topic} does not fit into any of the predefined themes, retrying..."
+                        )
                         continue
-                    df.at[idx, 'representative_topic'] = summarized_topic
+                    df.at[idx, "representative_topic"] = summarized_topic
                     break
                 except Exception as e:
-                    print(f'encountered error at row {idx}: {e}')
+                    print(f"encountered error at row {idx}: {e}")
                     print("retrying...")
             continue
         return df
@@ -198,7 +197,7 @@ class TopicNormalizer(PipelineComponent):
                 rep_topic = majority_vote
             else:
                 raise NotImplementedError
-            
+
             for idx, _ in cluster:
                 final_values[idx] = rep_topic
                 if strategy == "majority":
@@ -209,8 +208,3 @@ class TopicNormalizer(PipelineComponent):
             df[f"representative_{cluster_target}_count"] = final_values_count
         df[f"representative_{cluster_target}_cluster_id"] = final_cluster_id
         return df
-
-
-if __name__ == "__main__":
-    pass
-    # nc = NegationConverter()

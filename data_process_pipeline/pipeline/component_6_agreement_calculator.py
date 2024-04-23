@@ -4,7 +4,6 @@ import pandas as pd
 from spacy import displacy
 from pathlib import Path
 from tqdm import tqdm
-import json
 import numpy as np
 from utils.util import parse_to_int
 
@@ -18,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 class AgreementCalculator(PipelineComponent):
     description = "Gather the summarization and calculate the agreement among comments"
-    config_layer = "agreement_calculator"
+    config_layer = "6_agreement_calculator"
 
     def __init__(self, config: dict):
         super().__init__(config)

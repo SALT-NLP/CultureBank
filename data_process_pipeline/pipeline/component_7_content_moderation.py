@@ -11,6 +11,7 @@ from googleapiclient import discovery
 from utils.constants import CULTUREBANK_FIELDS
 from presidio_analyzer import AnalyzerEngine
 from transformers import pipeline
+import sys
 
 
 from spacy import displacy
@@ -30,7 +31,7 @@ PERSPECTIVE_API_KEY = os.getenv("PERSPECTIVE_API")
 
 class ContentModeration(PipelineComponent):
     description = "Content moderation for the knowledge bank, select records for manual annotation"
-    config_layer = "content_moderation"
+    config_layer = "7_content_moderation"
 
     def __init__(self, config: dict):
         super().__init__(config)
@@ -60,10 +61,9 @@ class ContentModeration(PipelineComponent):
 
     def load_classifier(self):
         # load_model
-        model_output_dir = self._local_config["model_dir"]
         classifier = pipeline(
             "text-classification",
-            model=model_output_dir,
+            model=self._local_config["model_dir"],
             device=self._local_config["device"],
         )
         return classifier
@@ -107,11 +107,18 @@ class ContentModeration(PipelineComponent):
         )
         controversial_df = df[df.cluster_id.isin(final_ids)]
         controversial_df = controversial_df.sample(frac=1, random_state=42)
-        controversial_df[self._local_config["controversial_field_name_to_annotate"]]=None
+        controversial_df[self._local_config["controversial_field_name_to_annotate"]] = (
+            None
+        )
         logger.info(f"this many for annotation {controversial_df.shape[0]}\n")
         logger.info(
-            f"PLEASE ANNOTATE THEM NOW!! {self._local_config['output_file_for_manual_annotation']}"
+            f"PLEASE ANNOTATE THEM NOW!! Type OK to continue {self._local_config['output_file_for_manual_annotation']}"
         )
+        user_input = input()
+        if user_input == "OK":
+            pass
+        else:
+            logger.info(f"you didn't type OK! please annotate the file above")
         self.save_output(
             controversial_df,
             save_dir=self._local_config["output_file_for_manual_annotation"],
@@ -255,7 +262,3 @@ class ContentModeration(PipelineComponent):
             save_dir,
             index=False,
         )
-
-
-if __name__ == "__main__":
-    pass

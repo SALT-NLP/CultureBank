@@ -1,3 +1,9 @@
+"""
+Example Usage:
+
+accelerate launch finetuning/dpo_mixtral.py --model_name_or_path=<your_model_name> --model_type='plain' --output_dir=<output_directory> --max_length 4096 --data_file=<path_to_training_data> --run_name <experiment_name> --warmup_steps 50 --gradient_accumulation_steps 8 --num_train_epochs 2 --report_to='wandb'
+"""
+
 # Adapted from: https://github.com/huggingface/trl/blob/main/examples/research_projects/stack_llama_2/scripts/dpo_llama2.py
 
 # 0. imports
@@ -7,16 +13,23 @@ from typing import Dict, Optional
 
 import torch
 from datasets import Dataset, load_dataset
-from peft import LoraConfig, PeftModel, AutoPeftModelForCausalLM, prepare_model_for_kbit_training
-from transformers import AutoModelForCausalLM, AutoTokenizer, HfArgumentParser, TrainingArguments, BitsAndBytesConfig, deepspeed
+from peft import (
+    LoraConfig,
+    PeftModel,
+    AutoPeftModelForCausalLM,
+    prepare_model_for_kbit_training,
+)
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    HfArgumentParser,
+    TrainingArguments,
+    BitsAndBytesConfig,
+    deepspeed,
+)
 
 from trl import DPOTrainer
 
-"""
-Example Usage:
-
-accelerate launch finetuning/dpo_mixtral.py --model_name_or_path=<your_model_name> --model_type='plain' --output_dir=<output_directory> --max_length 4096 --data_file=<path_to_training_data> --run_name <experiment_name> --warmup_steps 50 --gradient_accumulation_steps 8 --num_train_epochs 2 --report_to='wandb'
-"""
 
 # Define and parse arguments.
 @dataclass
@@ -26,27 +39,47 @@ class ScriptArguments:
     """
 
     # data parameters
-    beta: Optional[float] = field(default=0.1, metadata={"help": "the beta parameter for DPO loss"})
+    beta: Optional[float] = field(
+        default=0.1, metadata={"help": "the beta parameter for DPO loss"}
+    )
 
     # training parameters
     model_name_or_path: Optional[str] = field(
         default="../sft/results/final_checkpoint",
         metadata={"help": "the location of the SFT model name or path"},
     )
-    tokenizer: Optional[str] = field(default=None, metadata={"help": "path to tokenizer"})
+    tokenizer: Optional[str] = field(
+        default=None, metadata={"help": "path to tokenizer"}
+    )
     model_type: Optional[str] = field(
         default="plain",
         metadata={"help": "the type of the model: plain, merge, or peft"},
     )
-    adapter: Optional[str] = field(default="", metadata={"help": "path to peft adaptor"})
-    learning_rate: Optional[float] = field(default=5e-4, metadata={"help": "optimizer learning rate"})
-    lr_scheduler_type: Optional[str] = field(default="cosine", metadata={"help": "the lr scheduler type"})
-    warmup_steps: Optional[int] = field(default=100, metadata={"help": "the number of warmup steps"})
-    weight_decay: Optional[float] = field(default=0.05, metadata={"help": "the weight decay"})
-    optimizer_type: Optional[str] = field(default="paged_adamw_32bit", metadata={"help": "the optimizer type"})
+    adapter: Optional[str] = field(
+        default="", metadata={"help": "path to peft adaptor"}
+    )
+    learning_rate: Optional[float] = field(
+        default=5e-4, metadata={"help": "optimizer learning rate"}
+    )
+    lr_scheduler_type: Optional[str] = field(
+        default="cosine", metadata={"help": "the lr scheduler type"}
+    )
+    warmup_steps: Optional[int] = field(
+        default=100, metadata={"help": "the number of warmup steps"}
+    )
+    weight_decay: Optional[float] = field(
+        default=0.05, metadata={"help": "the weight decay"}
+    )
+    optimizer_type: Optional[str] = field(
+        default="paged_adamw_32bit", metadata={"help": "the optimizer type"}
+    )
 
-    per_device_train_batch_size: Optional[int] = field(default=1, metadata={"help": "train batch size per device"})
-    per_device_eval_batch_size: Optional[int] = field(default=1, metadata={"help": "eval batch size per device"})
+    per_device_train_batch_size: Optional[int] = field(
+        default=1, metadata={"help": "train batch size per device"}
+    )
+    per_device_eval_batch_size: Optional[int] = field(
+        default=1, metadata={"help": "eval batch size per device"}
+    )
     gradient_accumulation_steps: Optional[int] = field(
         default=16, metadata={"help": "the number of gradient accumulation steps"}
     )
@@ -54,25 +87,54 @@ class ScriptArguments:
         default=True, metadata={"help": "whether to use gradient checkpointing"}
     )
 
-    lora_alpha: Optional[float] = field(default=16, metadata={"help": "the lora alpha parameter"})
-    lora_dropout: Optional[float] = field(default=0.05, metadata={"help": "the lora dropout parameter"})
+    lora_alpha: Optional[float] = field(
+        default=16, metadata={"help": "the lora alpha parameter"}
+    )
+    lora_dropout: Optional[float] = field(
+        default=0.05, metadata={"help": "the lora dropout parameter"}
+    )
     lora_r: Optional[int] = field(default=8, metadata={"help": "the lora r parameter"})
 
-    max_prompt_length: Optional[int] = field(default=4096, metadata={"help": "the maximum prompt length"})
-    max_length: Optional[int] = field(default=8192, metadata={"help": "the maximum sequence length"})
-    num_train_epochs: Optional[int] = field(default=1, metadata={"help": "max number of training steps"})
-    max_steps: Optional[int] = field(default=-1, metadata={"help": "max number of training steps"})
-    logging_steps: Optional[int] = field(default=1, metadata={"help": "the logging frequency"})
-    save_steps: Optional[int] = field(default=500, metadata={"help": "the saving frequency"})
-    eval_steps: Optional[int] = field(default=100, metadata={"help": "the evaluation frequency"})
+    max_prompt_length: Optional[int] = field(
+        default=4096, metadata={"help": "the maximum prompt length"}
+    )
+    max_length: Optional[int] = field(
+        default=8192, metadata={"help": "the maximum sequence length"}
+    )
+    num_train_epochs: Optional[int] = field(
+        default=1, metadata={"help": "max number of training steps"}
+    )
+    max_steps: Optional[int] = field(
+        default=-1, metadata={"help": "max number of training steps"}
+    )
+    logging_steps: Optional[int] = field(
+        default=1, metadata={"help": "the logging frequency"}
+    )
+    save_steps: Optional[int] = field(
+        default=500, metadata={"help": "the saving frequency"}
+    )
+    eval_steps: Optional[int] = field(
+        default=100, metadata={"help": "the evaluation frequency"}
+    )
 
-    output_dir: Optional[str] = field(default="./results", metadata={"help": "the output directory"})
-    run_name: Optional[str] = field(default="dpo_mixtral", metadata={"help": "the name of the run"})
-    data_file: Optional[str] = field(default="/nlp/scr/zyanzhe/Maple/matplotlib_qa_all_preference_v0_6K.csv", metadata={"help": "data_file"})
-    log_freq: Optional[int] = field(default=1, metadata={"help": "the logging frequency"})
+    output_dir: Optional[str] = field(
+        default="./results", metadata={"help": "the output directory"}
+    )
+    run_name: Optional[str] = field(
+        default="dpo_mixtral", metadata={"help": "the name of the run"}
+    )
+    data_file: Optional[str] = field(
+        default="/nlp/scr/zyanzhe/Maple/matplotlib_qa_all_preference_v0_6K.csv",
+        metadata={"help": "data_file"},
+    )
+    log_freq: Optional[int] = field(
+        default=1, metadata={"help": "the logging frequency"}
+    )
 
     # instrumentation
-    sanity_check: Optional[bool] = field(default=False, metadata={"help": "only train on 1000 samples"})
+    sanity_check: Optional[bool] = field(
+        default=False, metadata={"help": "only train on 1000 samples"}
+    )
     report_to: Optional[str] = field(
         default="wandb",
         metadata={
@@ -144,39 +206,49 @@ def train():
         load_in_4bit=True,
         bnb_4bit_quant_type="nf4",
         bnb_4bit_compute_dtype=torch.float16,
-        bnb_4bit_use_double_quant=True
+        bnb_4bit_use_double_quant=True,
     )
 
     device_map = None
     world_size = int(os.environ.get("WORLD_SIZE", 1))
     ddp = world_size != 1
     device_map = {"": int(os.environ.get("LOCAL_RANK") or 0)} if ddp else None
-    device = torch.device(f"cuda:{int(os.environ.get('LOCAL_RANK') or 0)}") if ddp else torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    
-    tokenizer_path = script_args.tokenizer if script_args.tokenizer else script_args.model_name_or_path
-    
+    device = (
+        torch.device(f"cuda:{int(os.environ.get('LOCAL_RANK') or 0)}")
+        if ddp
+        else torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    )
+
+    tokenizer_path = (
+        script_args.tokenizer
+        if script_args.tokenizer
+        else script_args.model_name_or_path
+    )
+
     if script_args.model_type == "plain":
         model = AutoModelForCausalLM.from_pretrained(
             script_args.model_name_or_path,
             device_map=device_map,
             torch_dtype=torch.float16,
             quantization_config=bnb_config,
-            attn_implementation="flash_attention_2"
+            attn_implementation="flash_attention_2",
         )
     elif script_args.model_type == "merge":
-        model = AutoPeftModelForCausalLM.from_pretrained(script_args.adapter, device_map="cpu", torch_dtype=torch.float16)
+        model = AutoPeftModelForCausalLM.from_pretrained(
+            script_args.adapter, device_map="cpu", torch_dtype=torch.float16
+        )
         model = model.merge_and_unload()
         # model = model.to(device)
-        
+
         merged_checkpoint = os.path.join(script_args.adapter, "final_merged_checkpoint")
         model.save_pretrained(merged_checkpoint)
-        
+
         model = AutoModelForCausalLM.from_pretrained(
             merged_checkpoint,
             device_map=device_map,
             torch_dtype=torch.float16,
             quantization_config=bnb_config,
-            attn_implementation="flash_attention_2"
+            attn_implementation="flash_attention_2",
         )
     elif script_args.model_type == "peft":
         model = AutoModelForCausalLM.from_pretrained(
@@ -184,12 +256,12 @@ def train():
             device_map=device_map,
             torch_dtype=torch.float16,
             quantization_config=bnb_config,
-            attn_implementation="flash_attention_2"
+            attn_implementation="flash_attention_2",
         )
         model = PeftModel.from_pretrained(model, script_args.adapter)
     else:
         raise NotImplementedError
-    
+
     model.config.use_cache = False
 
     if script_args.ignore_bias_buffers:
@@ -214,17 +286,27 @@ def train():
     tokenizer.pad_token = tokenizer.eos_token
 
     # 2. Load the Stack-exchange paired dataset
-    train_dataset = get_stack_exchange_paired(data_file=script_args.data_file, data_dir="training", sanity_check=script_args.sanity_check)
+    train_dataset = get_stack_exchange_paired(
+        data_file=script_args.data_file,
+        data_dir="training",
+        sanity_check=script_args.sanity_check,
+    )
     train_dataset = train_dataset.filter(
-        lambda x: len(tokenizer(x["prompt"] + x["chosen"]).input_ids) <= script_args.max_length
-        and len(tokenizer(x["prompt"] + x["chosen"]).input_ids) <= script_args.max_length
+        lambda x: len(tokenizer(x["prompt"] + x["chosen"]).input_ids)
+        <= script_args.max_length
+        and len(tokenizer(x["prompt"] + x["chosen"]).input_ids)
+        <= script_args.max_length
     )
 
     # 3. Load evaluation dataset
-    eval_dataset = get_stack_exchange_paired(data_file=script_args.data_file, data_dir="evaluation", sanity_check=True)
+    eval_dataset = get_stack_exchange_paired(
+        data_file=script_args.data_file, data_dir="evaluation", sanity_check=True
+    )
     eval_dataset = eval_dataset.filter(
-        lambda x: len(tokenizer(x["prompt"] + x["chosen"]).input_ids) <= script_args.max_length
-        and len(tokenizer(x["prompt"] + x["chosen"]).input_ids) <= script_args.max_length
+        lambda x: len(tokenizer(x["prompt"] + x["chosen"]).input_ids)
+        <= script_args.max_length
+        and len(tokenizer(x["prompt"] + x["chosen"]).input_ids)
+        <= script_args.max_length
     )
 
     # 4. initialize training arguments:
@@ -261,7 +343,7 @@ def train():
         bias="none",
         task_type="CAUSAL_LM",
     )
-    
+
     if script_args.model_type == "peft":
         peft_config = None
 

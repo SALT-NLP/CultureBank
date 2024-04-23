@@ -7,15 +7,6 @@ import logging
 from pipeline.pipeline_component import PipelineComponent
 
 
-def get_best_ckpt(model_output_dir):
-    ckpt_dirs = os.listdir(model_output_dir)
-    ckpt_dirs = [dir for dir in ckpt_dirs if "checkpoint" in dir]
-    ckpt_dirs = sorted(ckpt_dirs, key=lambda x: int(x.split("-")[1]))
-    last_ckpt = ckpt_dirs[-1]
-
-    return os.path.join(model_output_dir, last_ckpt)
-
-
 logger = logging.getLogger(__name__)
 
 
@@ -23,7 +14,7 @@ class CultureRelevanceClassifier(PipelineComponent):
     description = (
         "Classify sentences/comments and pick out the culturally-relevant ones"
     )
-    config_layer = "culture_relevance_classifier"
+    config_layer = "0_culture_relevance_classifier"
 
     def __init__(self, config: dict):
         super().__init__(config)
@@ -41,12 +32,11 @@ class CultureRelevanceClassifier(PipelineComponent):
         # Get the classifier config
         self._model_name = self._local_config["model_name"]
         self._device = self._local_config["device"]
-        self._last_ckpt = get_best_ckpt(self._local_config["classifier_path"])
 
         # prepare the classifier
         self.classifier = pipeline(
             "text-classification",
-            model=self._last_ckpt,
+            model=self._local_config["classifier_path"],
             device=self._device,
         )
 

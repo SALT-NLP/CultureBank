@@ -1,3 +1,9 @@
+"""
+Example Usage:
+
+accelerate launch finetuning/sft_mixtral.py --model_name_or_path=<your_model_name> --output_dir=<output_directory> --max_seq_length 4096 --dataset_name=<name_or_path_to_input_dataset> --run_name <experiment_name> --warmup_steps 500 --gradient_accumulation_steps 16 --num_train_epochs 8
+"""
+
 # Adapted from: https://github.com/huggingface/trl/blob/main/examples/scripts/sft.py
 
 # Copyright 2023 The HuggingFace Inc. team. All rights reserved.
@@ -23,25 +29,38 @@ import os
 from datasets import load_dataset
 from peft import AutoPeftModelForCausalLM, LoraConfig
 from tqdm import tqdm
-from transformers import AutoModelForCausalLM, AutoTokenizer, HfArgumentParser, TrainingArguments
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    HfArgumentParser,
+    TrainingArguments,
+)
 
-from trl import ModelConfig, SFTTrainer, get_kbit_device_map, get_peft_config, get_quantization_config
+from trl import (
+    ModelConfig,
+    SFTTrainer,
+    get_kbit_device_map,
+    get_peft_config,
+    get_quantization_config,
+)
 from trl.import_utils import is_npu_available, is_xpu_available
 
 
-"""
-Example Usage:
-
-accelerate launch finetuning/sft_mixtral.py --model_name_or_path=<your_model_name> --output_dir=<output_directory> --max_seq_length 4096 --dataset_name=<name_or_path_to_input_dataset> --run_name <experiment_name> --warmup_steps 500 --gradient_accumulation_steps 16 --num_train_epochs 8
-"""
-
-
 tqdm.pandas()
+
+
 @dataclass
 class ScriptArguments:
-    dataset_name: str = field(default="/sphinx/u/culturebank/tiktok_data/mixtral_sft_v1.csv", metadata={"help": "the dataset name"})
-    dataset_text_field: str = field(default="text", metadata={"help": "the text field of the dataset"})
-    max_seq_length: int = field(default=8192, metadata={"help": "The maximum sequence length for SFT Trainer"})
+    dataset_name: str = field(
+        default="/sphinx/u/culturebank/tiktok_data/mixtral_sft_v1.csv",
+        metadata={"help": "the dataset name"},
+    )
+    dataset_text_field: str = field(
+        default="text", metadata={"help": "the text field of the dataset"}
+    )
+    max_seq_length: int = field(
+        default=8192, metadata={"help": "The maximum sequence length for SFT Trainer"}
+    )
     tokenizer: str = field(default=None, metadata={"help": "tokenizer path"})
 
 
@@ -53,7 +72,7 @@ if __name__ == "__main__":
     ################
     # Model & Tokenizer
     ################
-    
+
     # manually initializing the model and training configs
     model_config = ModelConfig(
         model_name_or_path=model_config.model_name_or_path,
@@ -68,7 +87,7 @@ if __name__ == "__main__":
         lora_target_modules=["q_proj", "v_proj"],
         lora_dropout=0.05,
     )
-    
+
     training_args = TrainingArguments(
         output_dir=training_args.output_dir,
         num_train_epochs=training_args.num_train_epochs,
@@ -91,14 +110,13 @@ if __name__ == "__main__":
         report_to="none",
         ddp_find_unused_parameters=False,
     )
-    
-    
+
     torch_dtype = (
         model_config.torch_dtype
         if model_config.torch_dtype in ["auto", None]
         else getattr(torch, model_config.torch_dtype)
     )
-    
+
     quantization_config = get_quantization_config(model_config)
     model_kwargs = dict(
         revision=model_config.model_revision,
@@ -108,19 +126,20 @@ if __name__ == "__main__":
         device_map=get_kbit_device_map(),
         quantization_config=quantization_config,
     )
-    
+
     print(model_kwargs)
     base_model = AutoModelForCausalLM.from_pretrained(
         model_config.model_name_or_path,
         **model_kwargs,
     )
-    
+
     base_model.config.use_cache = False
     peft_config = get_peft_config(model_config)
     print(peft_config)
 
-
-    tokenizer_path = args.tokenizer if args.tokenizer else model_config.model_name_or_path
+    tokenizer_path = (
+        args.tokenizer if args.tokenizer else model_config.model_name_or_path
+    )
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_path, trust_remote_code=True)
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"  # Fix weird overflow issue with fp16 training
@@ -130,7 +149,6 @@ if __name__ == "__main__":
     ################
     train_dataset = load_dataset("csv", data_files=args.dataset_name)["train"]
     print(train_dataset)
-
 
     ################
     # Training
@@ -148,6 +166,6 @@ if __name__ == "__main__":
     )
     trainer.train()
     trainer.save_model(training_args.output_dir)
-    
+
     output_dir = os.path.join(training_args.output_dir, "final_checkpoint")
     trainer.model.save_pretrained(output_dir)

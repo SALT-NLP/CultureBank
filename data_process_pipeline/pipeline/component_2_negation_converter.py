@@ -60,7 +60,7 @@ class NegationConverter(PipelineComponent):
     description = (
         "Convert the extracted data into positive form, if it contains negation"
     )
-    config_layer = "negation_converter"
+    config_layer = "2_negation_converter"
 
     def __init__(self, config: dict):
         super().__init__(config)

@@ -18,7 +18,12 @@ import pandas as pd
 import numpy as np
 
 from utils.util import parse_to_int, process_output
-from utils.prompt_utils import get_mixtral_user_prompt, reencode_prompt_utf16, truncate_to_token_limit, KNOWLEDGE_EXTRACTION_FIELDS
+from utils.prompt_utils import (
+    get_mixtral_user_prompt,
+    reencode_prompt_utf16,
+    truncate_to_token_limit,
+    KNOWLEDGE_EXTRACTION_FIELDS,
+)
 from pipeline.pipeline_component import PipelineComponent
 
 logger = logging.getLogger(__name__)
@@ -26,18 +31,21 @@ logger = logging.getLogger(__name__)
 
 class KnowledgeExtractor(PipelineComponent):
     description = "extracting structured cultural knowledge from social media comments"
-    config_layer = "knowledge_extractor"
-    
+    config_layer = "1_knowledge_extractor"
+
     def __init__(self, config: dict):
         super().__init__(config)
 
         # get local config
-        self._local_config = config[self.config_layer]        
-        self.sanity_check = self._local_config['sanity_check']
-        
-        
+        self._local_config = config[self.config_layer]
+        self.sanity_check = self._local_config["sanity_check"]
+
         model_name = self._local_config["model"]
-        tokenizer_path = self._local_config["tokenizer"] if "tokenizer" in self._local_config else model_name
+        tokenizer_path = (
+            self._local_config["tokenizer"]
+            if "tokenizer" in self._local_config
+            else model_name
+        )
         if self._local_config["pattern"] == "adapter":
             adapters = self._local_config["adapters"]
             assert len(adapters) >= 1
@@ -79,7 +87,10 @@ class KnowledgeExtractor(PipelineComponent):
 
                     logger.info("----------------------MERGING-----------------------")
                     logger.info(f"Loaded the adapter model {adapter_name}")
-        elif self._local_config["pattern"] == "merged" or self._local_config["pattern"] == "plain":
+        elif (
+            self._local_config["pattern"] == "merged"
+            or self._local_config["pattern"] == "plain"
+        ):
             text_model = AutoModelForCausalLM.from_pretrained(
                 model_name,
                 torch_dtype=torch.bfloat16,
@@ -94,39 +105,42 @@ class KnowledgeExtractor(PipelineComponent):
             )
         else:
             raise NotImplementedError
-        
+
         tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
-        
+
         self.tokenizer = tokenizer
         self.text_model = text_model
-    
+
     def run(self):
         df = pd.read_csv(self._local_config["input_file"])
-        
+
         if self._local_config["num_samples"] != -1:
-            df = df.sample(n=self._local_config["num_samples"], replace=False, random_state=1234)
+            df = df.sample(
+                n=self._local_config["num_samples"], replace=False, random_state=1234
+            )
         elif self._local_config["partition"] != -1:
-            assert self._local_config["partition"] < self._local_config["num_partitions"]
+            assert (
+                self._local_config["partition"] < self._local_config["num_partitions"]
+            )
             partitions = np.array_split(df, self._local_config["num_partitions"])
 
             for i in range(len(partitions)):
                 logger.info(f"partition {i}:")
                 logger.info(partitions[i].head())
-                logger.info('\n')
+                logger.info("\n")
             df = partitions[self._local_config["partition"]]
 
             logger.info(f"currently processing {len(df)} records")
             logger.info(df.head())
 
-
         if self.sanity_check:
             df = df.head(5)
         self.df = df
-        
+
         self.df["has_culture"] = False
         self.df["model_resp"] = ""
         self.df["json_output"] = ""
-        
+
         text_model = self.text_model
         tokenizer = self.tokenizer
 
@@ -166,7 +180,7 @@ class KnowledgeExtractor(PipelineComponent):
                 prompt = reencode_prompt_utf16(prompt)
                 if self.sanity_check:
                     logger.info(prompt)
-                    logger.info('\n')
+                    logger.info("\n")
 
                 num_retries = 10
                 output_text = None
@@ -181,7 +195,9 @@ class KnowledgeExtractor(PipelineComponent):
                             top_k=10,
                             top_p=0.2,
                         )
-                        output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+                        output_text = tokenizer.decode(
+                            outputs[0], skip_special_tokens=True
+                        )
 
                         # outputs = pipeline(prompt, max_new_tokens=512, do_sample=True, temperature=0.3, top_k=10, top_p=1.0)
                         # output_text = outputs[0]["generated_text"]
@@ -215,17 +231,26 @@ class KnowledgeExtractor(PipelineComponent):
                         if output_text:
                             logger.error("generated output:")
                             logger.error(output_text)
-                        logger.exception(f"error generating output at line {idx}, retrying...")
+                        logger.exception(
+                            f"error generating output at line {idx}, retrying..."
+                        )
             except Exception as e:
                 # logger.exception()
                 logger.exception(f"error encountered at line {idx}, continuing...")
                 continue
         self.save_output(df_results)
         logger.info("Knowledge Extraction Done!")
-    
+
     def save_output(self, df_results):
-        self.df["vid_unique"] = self.df["vid"].astype(str) + "-" + self.df.index.astype(str)
+        self.df["vid_unique"] = (
+            self.df["vid"].astype(str) + "-" + self.df.index.astype(str)
+        )
         self.df.to_csv(self._local_config["output_raw"], index=None)
-        df_results = pd.DataFrame.from_records(df_results, columns=["vid", "vid_unique", "comment_utc"] + KNOWLEDGE_EXTRACTION_FIELDS)
-        df_results["vid_unique"] = df_results["vid"].astype(str) + "-" + df_results.index.astype(str)
+        df_results = pd.DataFrame.from_records(
+            df_results,
+            columns=["vid", "vid_unique", "comment_utc"] + KNOWLEDGE_EXTRACTION_FIELDS,
+        )
+        df_results["vid_unique"] = (
+            df_results["vid"].astype(str) + "-" + df_results.index.astype(str)
+        )
         df_results.to_csv(self._local_config["output_file"], index=None)

@@ -1,6 +1,9 @@
 # CultureBank
 Quick Links: [[dataset-tiktok]](https://huggingface.co/datasets/SALT-NLP/CultureBank-TikTok) [[dataset-reddit]](https://huggingface.co/datasets/SALT-NLP/CultureBank-Reddit) [[Models](https://huggingface.co/datasets/SALT-NLP/CultureBank-Reddit)] [[Project Page]](https://salt-nlp.github.io/Design2Code/) [[Paper]](https://salt-nlp.github.io/Design2Code/)
 
+## setup
+`conda env create -f environment.yml
+`
 #todo:
 # PERSPECTIVE_API_KEY = os.getenv("PERSPECTIVE_API")
 
@@ -47,9 +50,9 @@ If you find our work helpful, please consider citing our paper:
 ```
 @misc{si2024design2code,
     title={CultureBank: An Online Community-Driven Knowledge Base Towards Culturally Aware Language Technologies},
-    author={Weiyan Shi and Ryan Li and Yutong Zhang and Ruibo Liu and Diyi Yang},
+    author={Weiyan Shi and Ryan Li and Yutong Zhang and Caleb Ziems and Chunhua Yu and Raya Horesh and Rogério Abreu de Paula and Diyi yang},
     year={2024},
-    eprint={2403.03163},
+    eprint={},
     archivePrefix={arXiv},
     primaryClass={cs.CL}
 }

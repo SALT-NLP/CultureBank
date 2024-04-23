@@ -1,25 +1,33 @@
 import logging
 import os
 
-from pipeline.component_negation_converter import NegationConverter
+from data_process_pipeline.pipeline.component_2_negation_converter import (
+    NegationConverter,
+)
 
-from pipeline.component_clustering import ClusteringComponent
+from data_process_pipeline.pipeline.component_3_clustering import ClusteringComponent
 from pipeline.pipeline_component import PipelineComponent
-from pipeline.component_knowledge_extractor import KnowledgeExtractor
-from pipeline.component_cluster_summarizer import ClusterSummarizer
-# from pipeline.component_confidence_calculator import ConfidenceCalculator
-from pipeline.component_agreement_calculator import AgreementCalculator
+from data_process_pipeline.pipeline.component_1_knowledge_extractor import (
+    KnowledgeExtractor,
+)
+from data_process_pipeline.pipeline.component_4_cluster_summarizer import (
+    ClusterSummarizer,
+)
 
-# from pipeline.component_confidence_calculator_for_reddits import (
-#     ConfidenceCalculatorForReddits,
-# )
-# from pipeline.component_content_moderation import ContentModeration
+from data_process_pipeline.pipeline.component_6_agreement_calculator import (
+    AgreementCalculator,
+)
+from data_process_pipeline.pipeline.component_7_content_moderation import (
+    ContentModeration,
+)
 
-from pipeline.component_final_formatter import FinalFormatter
-# from pipeline.component_content_filter import ContentFilter
-# from pipeline.component_controversial_filter import ControversialFilter
-from pipeline.component_topic_normalization import TopicNormalizer
-from pipeline.component_culture_relevance_classifier import CultureRelevanceClassifier
+from data_process_pipeline.pipeline.component_8_final_formatter import FinalFormatter
+from data_process_pipeline.pipeline.component_5_topic_normalization import (
+    TopicNormalizer,
+)
+from data_process_pipeline.pipeline.component_0_culture_relevance_classifier import (
+    CultureRelevanceClassifier,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -122,13 +130,12 @@ class CultureBankPipeline(Pipeline):
             CultureRelevanceClassifier,
             KnowledgeExtractor,
             NegationConverter,
-            # NormEntailment,
             ClusteringComponent,
             ClusterSummarizer,
             TopicNormalizer,
-            # ConfidenceCalculatorForReddits,
-            # ContentFilter,
-            # ControversialFilter,
+            AgreementCalculator,
+            ContentModeration,
+            FinalFormatter,
         ]
 
 

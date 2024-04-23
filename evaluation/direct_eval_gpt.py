@@ -1,3 +1,9 @@
+"""
+Example Usage:
+
+python evaluation/direct_eval_gpt.py --data_file <path_to_culturebank_data> --output_file <output_path> --model gpt-4-1106-preview
+"""
+
 from tqdm import tqdm
 from sklearn.metrics import f1_score
 
@@ -15,11 +21,6 @@ from utils.constants import EVAL_FIELDS
 from utils.prompt_utils import FIELD_DEFINITIONS, DIRECT_EVAL_PROMPT_TEMPLATE
 from utils.util import extract_yes_or_no
 
-"""
-Example Usage:
-
-python evaluation/direct_eval_gpt.py --data_file <path_to_culturebank_data> --output_file <output_path> --model gpt-4-1106-preview
-"""
 
 def main():
     parser = argparse.ArgumentParser()
@@ -29,13 +30,13 @@ def main():
     parser.add_argument("--num_samples", type=int, default=-1)
     parser.add_argument("--num_partitions", type=int, default=4)
     parser.add_argument("--partition", type=int, default=-1, choices=[-1, 0, 1, 2, 3])
-    parser.add_argument("--split", type=str, default="full", choices=["train", "test", "full"])
+    parser.add_argument(
+        "--split", type=str, default="full", choices=["train", "test", "full"]
+    )
     parser.add_argument("--sanity_check", action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
 
-
     model_name = args.model
-
 
     openai.api_key = os.getenv("OPENAI_API_KEY")
     client = OpenAI()
@@ -46,19 +47,16 @@ def main():
     top_p = 0.01
     seed = 1234
 
-
     df = pd.read_csv(args.data_file)
-
 
     if args.split and args.split != "full":
         df = df.sample(frac=1, random_state=1234).reset_index(drop=True)
         train_split = 0.8
         if args.split == "train":
-            df = df.head(int(len(df)*(train_split))).reset_index(drop=True)
+            df = df.head(int(len(df) * (train_split))).reset_index(drop=True)
         elif args.split == "test":
             test_split = (1.0 - train_split) / 2
-            df = df.tail(int(len(df)*(test_split))).reset_index(drop=True)
-
+            df = df.tail(int(len(df) * (test_split))).reset_index(drop=True)
 
     if args.num_samples != -1:
         df = df.sample(n=args.num_samples, replace=False, random_state=1234)
@@ -75,11 +73,10 @@ def main():
         print(f"currently processing {len(df)} clusters")
         print(df.head())
 
-
     if args.sanity_check:
         df = df.head(5)
-        
-    df = df.dropna(subset=['norm'])
+
+    df = df.dropna(subset=["norm"])
     df["model_resp"] = ""
 
     num_correct = 0
@@ -92,18 +89,21 @@ def main():
             for field in EVAL_FIELDS:
                 cultural_knowledge[field] = df_line[field]
                 field_definitions[field] = FIELD_DEFINITIONS[field]
-            
-            user_message = DIRECT_EVAL_PROMPT_TEMPLATE.format(json.dumps(field_definitions, indent=4), json.dumps(cultural_knowledge, indent=4))
-            
+
+            user_message = DIRECT_EVAL_PROMPT_TEMPLATE.format(
+                json.dumps(field_definitions, indent=4),
+                json.dumps(cultural_knowledge, indent=4),
+            )
+
             # zero shot inference without in-context examples
             messages = [{"role": "user", "content": user_message}]
             if args.sanity_check:
                 print(user_message)
                 print()
             # print(prompt)
-            
+
             num_retries = 1
-            
+
             for _ in range(num_retries):
                 try:
                     response = client.chat.completions.create(
@@ -116,38 +116,40 @@ def main():
                     )
                     response_content = response.choices[0].message.content.strip()
                     prompt_tokens = response.usage.prompt_tokens
-                    
+
                     if args.sanity_check:
                         print(response_content)
                         print()
-                    
+
                     parsed_resp = extract_yes_or_no(response_content)
                     df.at[idx, "model_resp"] = parsed_resp
-                    
+
                     pred = parsed_resp == "Yes"
-                    target = df_line['norm'] > 0.5
+                    target = df_line["norm"] > 0.5
                     if pred == target:
                         num_correct += 1
                     break
                 except Exception as e:
                     print(e)
-                    print(f"error generating output at cluster {df_line['cluster_id']}, retrying...")
+                    print(
+                        f"error generating output at cluster {df_line['cluster_id']}, retrying..."
+                    )
         except Exception as e:
             print(e)
             print(f"error encountered at cluster {idx}, continuing...")
             continue
-        
+
     df.to_csv(args.output_file, index=None)
 
     df = df.loc[df["model_resp"] != ""]
     print(f"Direct evaluation results for {model_name}: {num_correct / len(df)}")
 
     model_class = df["model_resp"]
-    target_class = df['norm'].apply(lambda x: "Yes" if x > 0.5 else "No")
-    weighted_f1 = f1_score(model_class, target_class, average='weighted')
+    target_class = df["norm"].apply(lambda x: "Yes" if x > 0.5 else "No")
+    weighted_f1 = f1_score(model_class, target_class, average="weighted")
     print(f"weighted f1 score: {weighted_f1}")
 
-    macro_f1 = f1_score(model_class, target_class, average='macro')
+    macro_f1 = f1_score(model_class, target_class, average="macro")
 
     print(f"macro f1 score: {macro_f1}")
 

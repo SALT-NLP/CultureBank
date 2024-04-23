@@ -1,3 +1,9 @@
+"""
+Example Usage:
+
+python evaluation/convert_to_desc.py --data_file <path_to_culturebank_data> --output_file <output_file>
+"""
+
 import pandas as pd
 import numpy as np
 from tqdm import tqdm
@@ -8,14 +14,14 @@ import argparse
 import openai
 from openai import OpenAI
 
-from utils.prompt_utils import FIELD_DEFINITIONS_SUMMARIZED, INCONTEXT_DESC, INCONTEXT_EXP, DESC_SYSTEM_PROMPT, DESC_USER_TEMPLATE
+from utils.prompt_utils import (
+    FIELD_DEFINITIONS_SUMMARIZED,
+    INCONTEXT_DESC,
+    INCONTEXT_EXP,
+    DESC_SYSTEM_PROMPT,
+    DESC_USER_TEMPLATE,
+)
 from utils.constants import DESC_FIELDS
-
-"""
-Example Usage:
-
-python evaluation/convert_to_desc.py --data_file <path_to_culturebank_data> --output_file <output_file>
-"""
 
 
 def main():
@@ -56,8 +62,12 @@ def main():
     top_p = 0.2
     seed = 1234
 
-    system_message = DESC_SYSTEM_PROMPT.format(json.dumps(FIELD_DEFINITIONS_SUMMARIZED, indent=4))
-    incontext_user_message = DESC_USER_TEMPLATE.format(json.dumps(INCONTEXT_EXP, indent=4))
+    system_message = DESC_SYSTEM_PROMPT.format(
+        json.dumps(FIELD_DEFINITIONS_SUMMARIZED, indent=4)
+    )
+    incontext_user_message = DESC_USER_TEMPLATE.format(
+        json.dumps(INCONTEXT_EXP, indent=4)
+    )
     incontext_assistant_message = INCONTEXT_DESC
 
     df_results = []
@@ -69,15 +79,17 @@ def main():
                 cultural_knowledge = {}
                 for field in DESC_FIELDS:
                     cultural_knowledge[field] = df_line[field]
-                
-                user_message = DESC_USER_TEMPLATE.format(json.dumps(cultural_knowledge, indent=4))
+
+                user_message = DESC_USER_TEMPLATE.format(
+                    json.dumps(cultural_knowledge, indent=4)
+                )
                 messages = [
-                    {"role": "system", "content": system_message}, 
+                    {"role": "system", "content": system_message},
                     {"role": "user", "content": incontext_user_message},
                     {"role": "assistant", "content": incontext_assistant_message},
                     {"role": "user", "content": user_message},
                 ]
-                
+
                 response = client.chat.completions.create(
                     model=model,
                     messages=messages,
@@ -90,7 +102,7 @@ def main():
                 response_content = response.choices[0].message.content
                 prompt_tokens = response.usage.prompt_tokens
                 description = response_content.strip()
-                
+
                 output_row = {}
                 output_row["cluster_id"] = df_line["cluster_id"]
                 output_row["desc"] = description
@@ -98,12 +110,13 @@ def main():
                 df_results.append(output_row)
                 break
             except Exception as e:
-                print(f'encountered error at row {idx}: {e}')
+                print(f"encountered error at row {idx}: {e}")
                 print("retrying...")
                 continue
 
     df_results = pd.DataFrame.from_records(df_results, columns=["cluster_id", "desc"])
     df_results.to_csv(args.output_file, index=None)
+
 
 if __name__ == "__main__":
     main()

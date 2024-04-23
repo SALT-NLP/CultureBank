@@ -1,3 +1,9 @@
+"""
+Example Usage:
+
+python evaluation/knowledge_entailment.py --data_file <path_to_grounded_eval_output> --output_file <output_path> --model_name <model_under_evaluation>
+"""
+
 import pandas as pd
 from tqdm import tqdm
 import argparse
@@ -6,14 +12,10 @@ import math
 import openai
 from openai import OpenAI
 
-from utils.prompt_utils import KNOWLEDGE_ENTAIL_SYSTEM_PROMPT, KNOWLEDGE_ENTAIL_USER_TEMPLATE
-
-
-"""
-Example Usage:
-
-python evaluation/knowledge_entailment.py --data_file <path_to_grounded_eval_output> --output_file <output_path> --model_name <model_under_evaluation>
-"""
+from utils.prompt_utils import (
+    KNOWLEDGE_ENTAIL_SYSTEM_PROMPT,
+    KNOWLEDGE_ENTAIL_USER_TEMPLATE,
+)
 
 
 def main():
@@ -39,7 +41,7 @@ def main():
         df["knowledge_entailment_aug"] = 0.0
     else:
         df["knowledge_entailment"] = 0.0
-        
+
     model = "gpt-4-1106-preview"
     temperature = 0
     max_tokens = 1
@@ -51,16 +53,23 @@ def main():
         for _ in range(num_retries):
             try:
                 df_line = df.iloc[idx]
-                knowledge_line = knowledge.loc[knowledge['cluster_id'] == df_line['cluster_id']].iloc[0]
+                knowledge_line = knowledge.loc[
+                    knowledge["cluster_id"] == df_line["cluster_id"]
+                ].iloc[0]
                 if args.aug:
                     desc, model_resp = knowledge_line["desc"], df_line["model_resp_aug"]
                 else:
                     desc, model_resp = knowledge_line["desc"], df_line["model_resp"]
                 messages = [
-                    {"role": "system", "content": KNOWLEDGE_ENTAIL_SYSTEM_PROMPT}, 
-                    {"role": "user", "content": KNOWLEDGE_ENTAIL_USER_TEMPLATE.format(model_resp, desc)},
+                    {"role": "system", "content": KNOWLEDGE_ENTAIL_SYSTEM_PROMPT},
+                    {
+                        "role": "user",
+                        "content": KNOWLEDGE_ENTAIL_USER_TEMPLATE.format(
+                            model_resp, desc
+                        ),
+                    },
                 ]
-                
+
                 response = client.chat.completions.create(
                     model=model,
                     messages=messages,
@@ -71,39 +80,46 @@ def main():
                     logprobs=True,
                     top_logprobs=5,
                 )
-                
+
                 top_logprobs = response.choices[0].logprobs.content[0].top_logprobs
-                
+
                 if args.sanity_check:
                     print(top_logprobs)
-                
+
                 yes_prob, no_prob = 0, 0
                 for logprob in top_logprobs:
                     if logprob.token == "Yes":
                         yes_prob = math.exp(logprob.logprob)
                     elif logprob.token == "No":
                         no_prob = math.exp(logprob.logprob)
-                
+
                 if yes_prob > 0 or no_prob > 0:
                     if args.aug:
                         df.at[idx, "knowledge_entailment_aug"] = yes_prob
                     else:
                         df.at[idx, "knowledge_entailment"] = yes_prob
                 else:
-                    print('Warning: the probabilities for both "Yes" and "No" are 0, continuing...')
+                    print(
+                        'Warning: the probabilities for both "Yes" and "No" are 0, continuing...'
+                    )
                     # the default value for knowledge entailment is 0
-                
+
                 break
             except Exception as e:
-                print(f'encountered error at row {idx}: {e}')
+                print(f"encountered error at row {idx}: {e}")
                 print("retrying...")
                 continue
 
     if args.aug:
-        print(f"Average score for {args.model_name}: {df.loc[:, 'knowledge_entailment_aug'].mean()}")
+        print(
+            f"Average score for {args.model_name}: {df.loc[:, 'knowledge_entailment_aug'].mean()}"
+        )
     else:
-        print(f"Average score for {args.model_name}: {df.loc[:, 'knowledge_entailment'].mean()}")
+        print(
+            f"Average score for {args.model_name}: {df.loc[:, 'knowledge_entailment'].mean()}"
+        )
     df.to_csv(args.output_file, index=None)
+
 
 if __name__ == "__main__":
     main()

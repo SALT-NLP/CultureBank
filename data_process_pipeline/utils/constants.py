@@ -49,13 +49,21 @@ SUMMARIZER_FIELDS = [
     "other descriptions",
 ]
 
+CLUSTERING_STAT_FIELDS = [
+    "cluster_id",
+    "cluster_size",
+    "raw_sample_vids",
+    "raw_samples",
+    "raw_sample_times",
+    "raw_sample_norms",
+]
 CULTURAL_TOPICS = [
     "Food and Dining",
     "Drinking and Alcohol",
-    "Cultural Exchange",  
+    "Cultural Exchange",
     "Communication and Language",
     "Consumer Behavior",
-    "Social Norms and Etiquette", 
+    "Social Norms and Etiquette",
     "Health and Hygiene",
     "Family Dynamics",
     "Household and Daily Life",
@@ -85,5 +93,5 @@ CULTURAL_TOPICS = [
     "Humor and Storytelling",
     "Sports and Recreation",
     "Travelling",
-    "Miscellaneous"
+    "Miscellaneous",
 ]

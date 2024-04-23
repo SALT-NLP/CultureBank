@@ -1,0 +1,8 @@
+vid,comment_utc,comment_content,pred_label,pred_score,cultural group,context,actor,recipient,relation,actor's behavior,goal,recipient's behavior,other descriptions,norm,topic
+0,1609477200,I traveled to America and tipping is a big cultural shock for me there,Yes,0.84,American,,people,,,tip,,,,1,tipping culture
+1,1546300800,Tipping culture is big in America but people don't tip in Japan,Yes,0.52,American,,people,,,tip,,,,1,tipping culture
+1,1546300800,Tipping culture is big in America but people don't tip in Japan,Yes,0.52,Japanese,,people,,,do not tip,,,,1,tipping culture
+2,1640995200,People in China use a lot of cashless payment like AliPay,Yes,0.88,Chinese,,people,,,use cashless payment,,,,1,finance
+3,1672531200,Tipping is optional in Australia,Yes,0.72,Australian,,people,,,usually do not tip ,,,,1,tipping culture
+4,1483228800,you can make a tip in high-end places in Australia,Yes,0.51,Australian,,people,,,tip at high-end places,,,,1,tipping culture
+5,1483228284,cool post,No,0.82,,,,,,,,,,,

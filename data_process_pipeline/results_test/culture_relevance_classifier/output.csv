@@ -1,0 +1,6 @@
+vid,comment_utc,title_content,comment_content,pred_label,pred_score
+0,1609477200,What are some cultural shocks you've experienced?,I traveled to America and tipping is a big cultural shock for me there,Yes,0.84
+1,1546300800,What are some cultural shocks you've experienced?,Tipping culture is big in America but people don't tip in Japan,Yes,0.9
+2,1640995200,suggestions for a trip to China,People in China use a lot of cashless payment like AliPay,Yes,0.88
+3,1672531200,Australian travels,Tipping is optional in Australia,Yes,0.72
+4,1483228800,Australian travels,you can make a tip in high-end places in Australia,Yes,0.51
