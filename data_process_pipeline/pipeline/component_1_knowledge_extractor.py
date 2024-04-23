@@ -240,6 +240,13 @@ class KnowledgeExtractor(PipelineComponent):
                 # logger.exception()
                 logger.exception(f"error encountered at line {idx}, continuing...")
                 continue
+        # clean up resources
+        del self.text_model
+        del self.tokenizer
+        del text_model
+        del tokenizer
+        
+        # storing results
         self.save_output(df_results)
         logger.info("Knowledge Extraction Done!")
 
