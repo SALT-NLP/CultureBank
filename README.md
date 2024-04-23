@@ -76,6 +76,10 @@ python data_process_pipeline/main.py -i 0 -c ./data_process_pipeline/configs/con
 5. [`evaluation/knowledge_entailment.py`](evaluation/knowledge_entailment.py): computes the knowledge entailment scores of models' generated responses in the grounded evaluations.
 6. [`evaluation/direct_eval.py`](evaluation/direct_eval.py): performs direct evaluation on language models on CultureBank data.
 
+**Evaluation on two downstream tasks**
+1. [`evaluation/downstream_tasks/cultural_nli.py`](evaluation/downstream_tasks/cultural_nli.py): evaluate on [cultural nli](https://aclanthology.org/2023.findings-emnlp.509/).
+2. [`evaluation/downstream_tasks/world_value_survey.py`](evaluation/downstream_tasks/world_value_survey.py): evaluate on the [world value survey](https://www.worldvaluessurvey.org/wvs.jsp) based on methods in [this paper](https://arxiv.org/abs/2306.16388).
+
 ## Fine-tuning scripts
 1. [`finetuning/sft_mixtral.py`](finetuning/sft_mixtral.py): a sample script to supervised-finetune a mixtral model on various tasks (extractor, summarizer, culturally-aware model, etc) with proper data preparation. 
 2. [`finetuning/dpo_mixtral.py`](finetuning/dpo_mixtral.py): a sample script to train a mixtral model with DPO on various tasks (culturally-aware model, etc) with proper data preparation. 
