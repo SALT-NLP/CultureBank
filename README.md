@@ -109,11 +109,11 @@ If you find our work helpful, please consider citing our paper:
     title={CultureBank: An Online Community-Driven Knowledge Base Towards Culturally Aware Language Technologies},
     author={Weiyan Shi and Ryan Li and Yutong Zhang and Caleb Ziems and Chunhua Yu and Raya Horesh and Rogério Abreu de Paula and Diyi yang},
     year={2024},
-    eprint={},
+    eprint={2404.15238},
     archivePrefix={arXiv},
     primaryClass={cs.CL}
 }
 ```
 
-We welcom all kinds of contributions. If you have any questions, feel free to leave issues or email us.
+We welcome all kinds of contributions. If you have any questions, feel free to leave issues or email us.
 
