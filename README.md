@@ -115,5 +115,5 @@ If you find our work helpful, please consider citing our paper:
 }
 ```
 
-We welcom all kinds of contributions. If you have any questions, feel free to leave issues or email us.
+We welcome all kinds of contributions. If you have any questions, feel free to leave issues or email us.
 
