@@ -1,5 +1,5 @@
 # <img src="figures/logo.png" width="36" height="36"> CultureBank 
-Quick Links: [[Paper]]() [[Project Page]](https://culturebank.github.io/) [[dataset-tiktok]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_tiktok.csv) [[dataset-reddit]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_reddit.csv) [[Models]](https://huggingface.co/collections/SALT-NLP/culturebank-6626ee7dcd54f5fffb6769fe) 
+Quick Links: [[Paper]](https://arxiv.org/abs/2404.15238) [[Project Page]](https://culturebank.github.io/) [[dataset-tiktok]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_tiktok.csv) [[dataset-reddit]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_reddit.csv) [[Models]](https://huggingface.co/collections/SALT-NLP/culturebank-6626ee7dcd54f5fffb6769fe) 
 
 
 ![alt text](figures/intro.png)
