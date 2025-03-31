@@ -6,7 +6,7 @@ Quick Links: [[Paper]](https://arxiv.org/abs/2404.15238) [[Project Page]](https:
 
 We provide:
 - an easy-to-use and generalizable [pipeline](#data-process-pipeline) to construct cultural knowledge bank from online communities
-- two cultural knowledge datasets, [[CultureBank-TikTok]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_tiktok.csv) and [[CultureBank-Reddit]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/culturebank_reddit.csv)
+- two cultural knowledge datasets, [[CultureBank-TikTok]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/tiktok/culturebank_tiktok.csv) and [[CultureBank-Reddit]](https://huggingface.co/datasets/SALT-NLP/CultureBank/blob/main/reddit/culturebank_reddit.csv)
 - [grounded cultural evaluation](#evaluation-scripts) and [fine-tuning](#fine-tuning-scripts) scripts
 
 ## Setup
@@ -30,7 +30,7 @@ We provide:
 The pipeline contains 9 components (see [`data_process_pipeline/pipeline/main_pipeline.py`](data_process_pipeline/pipeline/main_pipeline.py)).
 
 0. [`data_process_pipeline/pipeline/component_0_culture_relevance_classifier.py`](data_process_pipeline/pipeline/component_0_culture_relevance_classifier.py): classify if a comment is related to culture 
-1. [`data_process_pipeline/pipeline/component_1_knowledge_extractor.py.py`](data_process_pipeline/pipeline/component_1_knowledge_extractor.py.py): extract cultural information from the comment
+1. [`data_process_pipeline/pipeline/component_1_knowledge_extractor.py`](data_process_pipeline/pipeline/component_1_knowledge_extractor.py): extract cultural information from the comment
 2. [`data_process_pipeline/pipeline/component_2_negation_converter.py`](data_process_pipeline/pipeline/component_2_negation_converter.py): convert positive sentences to negative forms
 3. [`data_process_pipeline/pipeline/component_3_clustering.py`](data_process_pipeline/pipeline/component_3_clustering.py): perform clustering
 4. [`data_process_pipeline/pipeline/component_4_cluster_summarizer.py`](data_process_pipeline/pipeline/component_4_cluster_summarizer.py): summarize the clusters 
